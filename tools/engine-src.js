@@ -120,7 +120,7 @@ function eqStep(st,dt){const S=SYS[st.sys],sub=6,h=dt/sub;
  if(nf&&st.pendF<1)st.dueF=st.t;if(nr&&st.pendR<1)st.dueR=st.t;st.pendF=(st.pendF||0)+nf;st.pendR=(st.pendR||0)+nr;
  const sp=Math.sqrt(st.T/EQ_T0);
  for(const p of st.parts){p.x+=p.vx*dt*sp;p.y+=p.vy*dt*sp;eqClamp(st,p)}
- st.coll=st.coll||0;const c0=st.coll;eqCollide(st,dt);
+ st.coll=st.coll||0;const c0=st.coll;if(!st.fast)eqCollide(st,dt);   // st.fast: warm-up runs skip collisions (counts don't depend on them)
  /* reactions that wait too long for the right collision (few particles, cold box) happen anyway, so counts stay true */
  while(st.pendF>=1&&(st.pendF>6||st.t-(st.dueF||0)>0.8)){st.pendF--;if(eqEvent(st,S.R,S.P,1))st.evF++;else{st.pendF=0;break}st.dueF=st.t}
  while(st.pendR>=1&&(st.pendR>6||st.t-(st.dueR||0)>0.8)){st.pendR--;if(eqEvent(st,S.P,S.R,-1))st.evR++;else{st.pendR=0;break}st.dueR=st.t}

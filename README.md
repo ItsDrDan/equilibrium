@@ -2,7 +2,7 @@
 
 Study game for CHEM 3A, matched to the Lecture 28–29 equilibrium slides. Live at https://itsdrdan.github.io/equilibrium/
 
-Current version: 2.1
+Current version: 3.1
 
 - `index.html`: the whole game (standalone). Loads the brand kit (`games/brand/itsdrdan.css`, `embed.js`) and `games/track.js` for anonymous stats.
 - Modes: 🎢 Ride Line (theme-park line model of equilibrium), 🔬 Particle Lab (five live reactions incl. the blood buffer; particles collide like billiard balls and react only at collisions), ↔️ Shift It! (Le Châtelier predictions + real-world medical, biology, engineering scenarios), 🧠 Big Ideas & K.
