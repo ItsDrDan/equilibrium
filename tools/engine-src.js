@@ -7,7 +7,7 @@
    so heating favors the endothermic direction; a catalyst multiplies BOTH by the same factor. */
 const EQ_T0=298,EQ_R=8.314;
 const SYS={
- no2:{title:'N₂O₄ ⇌ NO₂ (sealed flask)',gas:true,heat:true,dH:57,
+ no2:{real:'🏙️ Brown NO₂ is the haze in city smog: it builds up on hot, sunny days.',title:'N₂O₄ ⇌ NO₂ (sealed flask)',gas:true,heat:true,dH:57,
   eq:[[1,'N2O4','g']],eqP:[[2,'NO2','g']],
   sp:{N2O4:{l:'N₂O₄',c:'#f3ead2',e:'#9c8456',r:9},NO2:{l:'NO₂',c:'#b5562a',e:'#6f3015',r:7}},
   R:['N2O4'],P:['NO2','NO2'],kf:0.16,kr:0.0042,Ef:26000,Er:-18000,
@@ -15,7 +15,7 @@ const SYS={
   tint:{sp:'NO2',rgb:[160,72,28],k:0.0085,max:0.62},tintName:'brown color',
   look:'brown NO₂ gas; N₂O₄ is nearly colorless',
   stress:[['addR','➕ N₂O₄',{N2O4:15}],['addP','➕ NO₂',{NO2:30}],['remP','➖ NO₂',{NO2:-0.5}]]},
- hi:{title:'H₂ + I₂ ⇌ 2 HI',gas:true,heat:true,dH:-9,
+ hi:{real:'🏭 Hydrogen iodide is made for medicines and disinfectants; the violet I₂ shows how far it has reacted.',title:'H₂ + I₂ ⇌ 2 HI',gas:true,heat:true,dH:-9,
   eq:[[1,'H2','g'],[1,'I2','g']],eqP:[[2,'HI','g']],
   sp:{H2:{l:'H₂',c:'#ffffff',e:'#7d8a94',r:5.5},I2:{l:'I₂',c:'#6b3fa0',e:'#3e1f63',r:9},HI:{l:'HI',c:'#d8c8ec',e:'#7a62a0',r:7}},
   R:['H2','I2'],P:['HI','HI'],kf:0.0105,kr:0.00175,Ef:22000,Er:47000,
@@ -23,7 +23,7 @@ const SYS={
   tint:{sp:'I2',rgb:[110,50,160],k:0.012,max:0.6},tintName:'purple color',
   look:'violet I₂ vapor; H₂ and HI are colorless',
   stress:[['addR','➕ H₂',{H2:20}],['addR2','➕ I₂',{I2:20}],['addP','➕ HI',{HI:30}]]},
- fescn:{title:'Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ (blood-red)',gas:false,heat:true,dH:-1,
+ fescn:{real:'🧪 A classic lab test: the blood-red color reveals Fe³⁺ (iron) or SCN⁻ in a sample.',title:'Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ (blood-red)',gas:false,heat:true,dH:-1,
   eq:[[1,'Fe','aq'],[1,'SCN','aq']],eqP:[[1,'FeSCN','aq']],
   sp:{Fe:{l:'Fe³⁺',c:'#f0c64a',e:'#a7801a',r:7.5},SCN:{l:'SCN⁻',c:'#cfd7dd',e:'#6f7b84',r:6},FeSCN:{l:'FeSCN²⁺',c:'#b3122a',e:'#6b0716',r:9.5}},
   R:['Fe','SCN'],P:['FeSCN'],kf:0.0036,kr:0.075,Ef:20000,Er:50000,
@@ -31,7 +31,15 @@ const SYS={
   tint:{sp:'FeSCN',rgb:[178,18,40],k:0.016,max:0.7},tintName:'red color',
   look:'blood-red FeSCN²⁺; Fe³⁺ is pale yellow, SCN⁻ colorless',
   stress:[['addR','➕ Fe³⁺',{Fe:20}],['addR2','➕ SCN⁻',{SCN:20}],['remR','➖ Fe³⁺',{Fe:-0.6}]]},
- hb:{title:'Hb + O₂ ⇌ HbO₂ (your blood)',gas:false,heat:false,dH:null,
+ blood:{real:'🩸 The main buffer in your blood keeps pH near 7.4. Lungs remove CO₂; kidneys adjust HCO₃⁻.',title:'CO₂ + H₂O ⇌ H⁺ + HCO₃⁻ (blood buffer)',gas:false,heat:false,dH:null,
+  eq:[[1,'CO2','aq'],[1,'H2O','l']],eqP:[[1,'H','aq'],[1,'HCO3','aq']],
+  sp:{CO2:{l:'CO₂',c:'#8b96a0',e:'#4d5862',r:10},H:{l:'H⁺',c:'#ff8fb1',e:'#b23a62',r:4.5},HCO3:{l:'HCO₃⁻',c:'#7cc4e8',e:'#2e6f96',r:10}},
+  R:['CO2'],P:['H','HCO3'],kf:0.12,kr:0.0103,Ef:30000,Er:30000,
+  units:{CO2:1,H:1,HCO3:1},start:{CO2:40,HCO3:25,H:0},
+  tint:{sp:'H',mix:[[214,40,80],[240,200,40]],lo:5,hi:15,a:0.34},tintName:'indicator color',tube:'pH indicator',
+  look:'a pH indicator in the blood sample: pink-red when basic, yellow when acidic',
+  stress:[['remR','😮‍💨 Hyperventilate (blow off CO₂)',{CO2:-0.5}],['addR','🫁 Hold breath / COPD (+CO₂)',{CO2:20}],['addP','🏃 Lactic acid (+H⁺)',{H:12}],['addP2','💉 Bicarbonate IV (+HCO₃⁻)',{HCO3:20}]]},
+ hb:{real:'⛰️ Climbers, athletes and patients on oxygen: how much O₂ your hemoglobin carries.',title:'Hb + O₂ ⇌ HbO₂ (your blood)',gas:false,heat:false,dH:null,
   eq:[[1,'Hb','aq'],[1,'O2','g']],eqP:[[1,'HbO2','aq']],
   sp:{Hb:{l:'Hb',c:'#7b2f4a',e:'#45142a',r:10},O2:{l:'O₂',c:'#9fd3f2',e:'#3f86b5',r:5.5},HbO2:{l:'HbO₂',c:'#ef4a3c',e:'#9c1d14',r:11}},
   R:['Hb','O2'],P:['HbO2'],kf:0.0042,kr:0.1,Ef:30000,Er:30000,
@@ -60,33 +68,65 @@ function eqNew(sys,o={}){const S=SYS[sys];
  for(const s in start)for(let i=0;i<start[s];i++)eqSpawn(st,s);
  Object.keys(S.sp).forEach(s=>st.x[s]=st.n[s]);const r=eqRates(st);st.ema={f:r.f,r:r.r};return st}
 function eqW(st){return st.W0*st.V}
-function eqSpawn(st,s,x,y){const S=SYS[st.sys],sp=S.sp[s],W=eqW(st),m=sp.r+2;
- const a=eqRand(st)*Math.PI*2,v=(38+eqRand(st)*34)*(9/sp.r)**0.5;
- const p={s,x:x??m+eqRand(st)*(W-2*m),y:y??m+eqRand(st)*(st.H-2*m),vx:Math.cos(a)*v,vy:Math.sin(a)*v,born:st.t};
+function eqSpawn(st,s,x,y,vx,vy){const S=SYS[st.sys],sp=S.sp[s],W=eqW(st),m=sp.r+2;
+ const a=eqRand(st)*Math.PI*2,v=(55+eqRand(st)*40)*(9/sp.r)**0.5;
+ const p={s,x:x??m+eqRand(st)*(W-2*m),y:y??m+eqRand(st)*(st.H-2*m),vx:vx??Math.cos(a)*v,vy:vy??Math.sin(a)*v,born:st.t};
  st.parts.push(p);st.n[s]=(st.n[s]||0)+1;return p}
-function eqKill(st,p){const i=st.parts.indexOf(p);if(i>=0){st.parts.splice(i,1);st.n[p.s]--}}
+function eqKill(st,p){const i=st.parts.indexOf(p);if(i>=0){st.parts.splice(i,1);st.n[p.s]--;p.dead=true}}
 function eqPickPartner(st,p,s){let best=null,bd=1e18;for(const q of st.parts){if(q===p||q.s!==s)continue;const d=(q.x-p.x)**2+(q.y-p.y)**2;if(d<bd){bd=d;best=q}}return best}
-/* one reaction event: reactant particles become product particles in the same place */
+const eqMass=(st,p)=>SYS[st.sys].sp[p.s].r**2;
+/* reactant particles become product particles in the same place; momentum is shared out so the motion looks natural */
+function eqTransform(st,used,to,dir){
+ const M=used.reduce((m,p)=>m+eqMass(st,p),0),cx=used.reduce((s,p)=>s+p.x,0)/used.length,cy=used.reduce((s,p)=>s+p.y,0)/used.length;
+ const vx=used.reduce((s,p)=>s+p.vx*eqMass(st,p),0)/M,vy=used.reduce((s,p)=>s+p.vy*eqMass(st,p),0)/M;
+ used.forEach(p=>eqKill(st,p));
+ if(to.length===used.length)to.forEach((s,i)=>eqClamp(st,eqSpawn(st,s,used[i].x,used[i].y,used[i].vx,used[i].vy)));
+ else if(to.length>used.length){const ang=eqRand(st)*Math.PI*2,kx=Math.cos(ang),ky=Math.sin(ang),kick=45;
+  to.forEach((s,i)=>{const g=i?1:-1;eqClamp(st,eqSpawn(st,s,cx+kx*9*g,cy+ky*9*g,vx+kx*kick*g,vy+ky*kick*g))})}
+ else to.forEach(s=>eqClamp(st,eqSpawn(st,s,cx,cy,vx,vy)));
+ st.flashes.push({x:cx,y:cy,t:st.t,dir})}
+/* fallback event (no collision needed): used when a reaction is overdue or counts must catch up */
 function eqEvent(st,from,to,dir){const pool=st.parts.filter(p=>p.s===from[0]);if(!pool.length)return false;
  const a=pool[Math.floor(eqRand(st)*pool.length)],used=[a];
  for(let i=1;i<from.length;i++){const b=eqPickPartner(st,used[0],from[i]);if(!b||used.includes(b))return false;used.push(b)}
- const cx=used.reduce((s,p)=>s+p.x,0)/used.length,cy=used.reduce((s,p)=>s+p.y,0)/used.length;
- used.forEach(p=>eqKill(st,p));
- to.forEach((s,i)=>{let x=cx,y=cy;if(to.length>used.length){const ang=eqRand(st)*Math.PI*2;x+=Math.cos(ang)*9*(i?1:-1);y+=Math.sin(ang)*9*(i?1:-1)}
-  else if(to.length===used.length){x=used[i].x;y=used[i].y}eqClamp(st,eqSpawn(st,s,x,y))});
- st.flashes.push({x:cx,y:cy,t:st.t,dir});return true}
+ eqTransform(st,used,to,dir);return true}
 function eqClamp(st,p){const r=SYS[st.sys].sp[p.s].r,W=eqW(st);if(p.x<r){p.x=r;p.vx=Math.abs(p.vx)}if(p.x>W-r){p.x=W-r;p.vx=-Math.abs(p.vx)}if(p.y<r){p.y=r;p.vy=Math.abs(p.vy)}if(p.y>st.H-r){p.y=st.H-r;p.vy=-Math.abs(p.vy)}}
+/* which particles of a colliding pair react, if this pair fits one side of the equation */
+function eqFits(side,a,b){if(side.length===1)return a.s===side[0]?[a]:b.s===side[0]?[b]:null;
+ return (a.s===side[0]&&b.s===side[1])?[a,b]:(b.s===side[0]&&a.s===side[1])?[b,a]:null}
+/* billiard-ball collisions (equal-energy elastic bounce, mass ∝ size²), found with a grid so phones stay smooth.
+   A reaction only happens at a collision: the rate equations decide HOW MANY collisions react (st.pendF / st.pendR);
+   every other collision just bounces. */
+function eqCollide(st,dt){const S=SYS[st.sys],C=24,cols=Math.ceil(eqW(st)/C)+1,grid=new Map();
+ st.parts.forEach(p=>{const k=Math.floor(p.x/C)+Math.floor(p.y/C)*cols;let a=grid.get(k);if(!a)grid.set(k,a=[]);a.push(p)});
+ const list=st.parts.slice();
+ for(const a of list){if(a.dead)continue;const cx=Math.floor(a.x/C),cy=Math.floor(a.y/C);
+  for(let gx=cx-1;gx<=cx+1;gx++)for(let gy=cy-1;gy<=cy+1;gy++){const cell=grid.get(gx+gy*cols);if(!cell)continue;
+   for(const b of cell){if(a.dead)break;if(b===a||b.dead||b.x<a.x||(b.x===a.x&&b.y<=a.y))continue;
+    const ra=S.sp[a.s].r,rb=S.sp[b.s].r,dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,R=ra+rb;if(d2>=R*R||d2===0)continue;
+    const d=Math.sqrt(d2),nx=dx/d,ny=dy/d,rel=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
+    const ma=ra*ra,mb=rb*rb,ov=(R-d)/2;a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;
+    if(rel>=0)continue;                                      // already moving apart
+    st.coll++;
+    let r=st.pendF>=1&&eqFits(S.R,a,b);
+    if(r){st.pendF--;st.evF++;st.viaColl=(st.viaColl||0)+1;eqTransform(st,r,S.P,1);continue}
+    r=st.pendR>=1&&eqFits(S.P,a,b);
+    if(r){st.pendR--;st.evR++;st.viaColl=(st.viaColl||0)+1;eqTransform(st,r,S.R,-1);continue}
+    const j=2*rel/(ma+mb);a.vx+=j*mb*nx;a.vy+=j*mb*ny;b.vx-=j*ma*nx;b.vy-=j*ma*ny}}}}
 function eqStep(st,dt){const S=SYS[st.sys],sub=6,h=dt/sub;
  for(let j=0;j<sub;j++){const r=eqRates(st),net=(r.f-r.r)*h;
   S.R.forEach(s=>st.x[s]=Math.max(0,st.x[s]-net));S.P.forEach(s=>st.x[s]=Math.max(0,st.x[s]+net));st.accF+=r.f*h;st.accR+=r.r*h}
- /* particles follow: one event per whole unit of each rate; keep particle counts within one step of x */
- let guard=0;while((st.accF>=1||st.accR>=1)&&guard++<200){
-  if(st.accF>=1&&(st.accF>=st.accR||st.accR<1)){st.accF--;if(eqEvent(st,S.R,S.P,1))st.evF++}
-  else{st.accR--;if(eqEvent(st,S.P,S.R,-1))st.evR++}}
- for(const s of new Set(S.P)){const lag=st.n[s]-st.x[s];
-  if(lag<-1.5){if(eqEvent(st,S.R,S.P,1))st.evF++}else if(lag>1.5){if(eqEvent(st,S.P,S.R,-1))st.evR++}}
+ const nf=Math.floor(st.accF),nr=Math.floor(st.accR);st.accF-=nf;st.accR-=nr;
+ if(nf&&st.pendF<1)st.dueF=st.t;if(nr&&st.pendR<1)st.dueR=st.t;st.pendF=(st.pendF||0)+nf;st.pendR=(st.pendR||0)+nr;
  const sp=Math.sqrt(st.T/EQ_T0);
- for(const p of st.parts){p.x+=p.vx*dt*sp/(p.sp0||1);p.y+=p.vy*dt*sp/(p.sp0||1);eqClamp(st,p)}
+ for(const p of st.parts){p.x+=p.vx*dt*sp;p.y+=p.vy*dt*sp;eqClamp(st,p)}
+ st.coll=st.coll||0;const c0=st.coll;eqCollide(st,dt);
+ /* reactions that wait too long for the right collision (few particles, cold box) happen anyway, so counts stay true */
+ while(st.pendF>=1&&(st.pendF>6||st.t-(st.dueF||0)>0.8)){st.pendF--;if(eqEvent(st,S.R,S.P,1))st.evF++;else{st.pendF=0;break}st.dueF=st.t}
+ while(st.pendR>=1&&(st.pendR>6||st.t-(st.dueR||0)>0.8)){st.pendR--;if(eqEvent(st,S.P,S.R,-1))st.evR++;else{st.pendR=0;break}st.dueR=st.t}
+ for(const s of new Set(S.P)){const lag=st.n[s]-st.x[s],tol=Math.max(1.5,0.06*st.x[s]);
+  if(lag<-tol){if(eqEvent(st,S.R,S.P,1))st.evF++}else if(lag>tol){if(eqEvent(st,S.P,S.R,-1))st.evR++}}
+ const a=1-Math.exp(-dt/1.5);st.collRate=(st.collRate||0)+((st.coll-c0)/dt-(st.collRate||0))*a;
  const r2=eqRates(st);st.ema.f=r2.f;st.ema.r=r2.r;
  st.t+=dt;st.flashes=st.flashes.filter(f=>st.t-f.t<0.45)}
 /* stresses: add/remove particles, temperature, volume, catalyst. Each leaves a mark on the graph. */
