@@ -4,6 +4,6 @@
   "course": "CHEM 3A",
   "description": "Chemical equilibrium and Le Châtelier's principle for CHEM 3A, built on Dr. Dan's Lectures 28–29 (start of Chapter 13). Four modes: Ride Line (equilibrium as a theme-park line: guests in line are reactants, riders are products, boarding and coming back are the forward and reverse rates; tour bus, fireworks, extra crew and longer ride show adding, removing, a catalyst and a change in K), Particle Lab (live particle views of N₂O₄ ⇌ 2 NO₂, H₂ + I₂ ⇌ 2 HI, Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ and Hb + O₂ ⇌ HbO₂ with add/remove buttons, temperature and volume sliders, catalyst, start from reactants or products, a rate balance beam, a 'what you'd see' color tube and a concentration-vs-time graph), Shift It! (Le Châtelier predictions on 16 reactions: direction, amounts, and K, with the lab animating the change after answering) and Big Ideas & K (dynamic equilibrium, writing K expressions, heterogeneous equilibria, size of K, reverse K, reading graphs). Lab questions require a step in the lab before checking. Every question explains the right answer and each wrong choice; hints link to matched ItsDrDan videos.",
   "tags": ["chemistry", "CHEM 3A", "equilibrium", "dynamic equilibrium", "Le Chatelier's principle", "equilibrium constant", "K expression", "heterogeneous equilibrium", "reaction rates", "catalyst", "particle simulation", "hemoglobin"],
-  "version": "1",
+  "version": "1.1",
   "status": "working"
 }

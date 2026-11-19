@@ -731,6 +731,12 @@ function audit(n=300){const bad=[],note=m=>{if(bad.length<40)bad.push(m)};
   if(q.options.filter(o=>o!==q.answer).some(o=>!q.whys[o]))note(m.id+': missing wrong reason: '+q.prompt.slice(0,60)+' / '+q.options.filter(o=>!q.whys[o]).join(' | '));
   if(q.lab&&q.lab.kind==='eq'&&!SYS[q.lab.sys])note(m.id+': bad sim '+q.lab.sys)}}
  return bad.length?bad:'OK · '+MODES.length+' modes × '+n}
+/* Deep links (v1.1): ?mode=ride|lab|shift|ideas opens that mode; &sys=no2|hi|fescn|hb picks the Particle Lab reaction.
+   Used by the CHEM 3A textbook's Explore It boxes. A link sets the mode for this visit only (the saved choice is not changed). */
+(()=>{const P=new URLSearchParams(location.search),m=P.get('mode'),y=P.get('sys');
+ if(MODES.some(x=>x.id===m))state.mode=m;
+ if(LAB_SYS.some(([k])=>k===y)){state.labSys=y;if(!m)state.mode='lab'}
+ if(m||y)addEventListener('load',()=>setTimeout(()=>{const e=$('modes');if(e)scrollTo(0,e.getBoundingClientRect().top+scrollY-8)},150))})();
 buildModes();renderJ();next();
 </script>
 </body></html>
