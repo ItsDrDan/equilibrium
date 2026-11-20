@@ -2,10 +2,10 @@
 
 Study game for CHEM 3A, matched to the Lecture 28–29 equilibrium slides. Live at https://itsdrdan.github.io/equilibrium/
 
-Current version: 3.1
+Current version: 4.1
 
 - `index.html`: the whole game (standalone). Loads the brand kit (`games/brand/itsdrdan.css`, `embed.js`) and `games/track.js` for anonymous stats.
-- Modes: 🎢 Ride Line (theme-park line model of equilibrium), 🔬 Particle Lab (five live reactions incl. the blood buffer; particles collide like billiard balls and react only at collisions), ↔️ Shift It! (Le Châtelier predictions + real-world medical, biology, engineering scenarios), 🧠 Big Ideas & K.
+- Modes: 🎢 Ride Line (theme-park line model of equilibrium), 🔬 Particle Lab (five live reactions incl. the blood buffer; particles collide like billiard balls and react only at collisions), ↔️ Shift It! (Le Châtelier predictions + real-world medical, biology, engineering scenarios), 🧠 Big Ideas & K, 🧮 Calculate K, 🎯 Skill Check (10 questions → study plan).
 - Deep links (v1.1): `?mode=ride|lab|shift|ideas` opens that mode; `&sys=no2|hi|fescn|hb` picks the Particle Lab reaction (for example `?mode=lab&sys=hb`). A link sets the mode for that visit only and scrolls to the game. The CHEM 3A textbook's Explore It boxes use these.
 - `assets/`: logo, mode and achievement badges (256 px WebP, cut from the ChatGPT art sheets).
 - Source: edit `tools/page-src.html` (page, questions) and `tools/engine-src.js` (simulation), then `node tools/build.js` to rebuild `index.html`.

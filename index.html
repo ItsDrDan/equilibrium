@@ -44,6 +44,17 @@ details.howto ul{margin:0 18px 14px;padding-left:22px;line-height:1.6}
 .hint{background:#fff3c9;border:2px solid #efd27a;box-shadow:0 3px 0 #e0bd55}
 .show{background:#efe8fb;border:2px solid #cdbbec;box-shadow:0 3px 0 #b49ddc}
 .prompt{font-size:20px;font-weight:800;margin:14px 0 8px}
+.numrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.num{flex:1;min-width:180px;min-height:54px;font-size:20px;font-weight:700;border:2px solid #9fb6c8;border-radius:14px;padding:8px 14px;background:#fff}
+.chip.ins{min-width:52px;font-size:17px;background:#eef6ff;border-color:#b9d3ea}
+.num:focus{outline:3px solid #4a9fd6;outline-offset:2px}.unit{font-size:18px;font-weight:800}
+.givens{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:8px;font-size:17px;font-weight:700}
+.givens span{background:#f3f8fd;border:1px solid #d6e4ef;border-radius:10px;padding:3px 10px}
+#practice.quizmode .btnrow{grid-template-columns:1fr}#practice.quizmode #hintBtn,#practice.quizmode #showBtn{display:none}
+.qprog{display:flex;gap:4px;margin:10px 0 0}.qprog i{flex:1;height:8px;border-radius:99px;background:#e6e0d2}.qprog i.ok{background:#4fa36a}.qprog i.no{background:#d9776f}.qprog i.now{background:#4a9fd6}
+.qsum{text-align:center}.qsum .big{font-size:44px;font-weight:900;margin:6px 0}.qsum table{margin:10px auto;border-collapse:collapse;text-align:left;font-size:15.5px}.qsum td{padding:6px 10px;border-top:1px solid #eee}.qsum td:last-child{white-space:nowrap}#practice.quizdone .btnrow{display:none}
+.plan{display:grid;gap:8px;margin-top:10px;text-align:left}.plan .item{background:#fff8e6;border:1px solid #f0dfae;border-radius:12px;padding:10px 12px}.plan .btn{min-height:44px;font-size:15px;padding:8px 14px;margin:6px 8px 0 0}
+@media(max-width:1000px){.ddfb-float.eq-hide{opacity:0!important;pointer-events:none!important;transform:translateY(12px)!important}}
 .tagchip{display:inline-block;font-size:13px;font-weight:900;background:#eef6ff;border:1px solid #c9dff2;border-radius:999px;padding:2px 9px;margin-right:4px;vertical-align:2px}
 .task{display:flex;gap:8px;align-items:center;background:#fff6e0;border:2px dashed #f0c45c;border-radius:14px;padding:8px 12px;font-weight:800;font-size:15.5px;margin:6px 0}
 .task.done{background:#e8f7ec;border:2px solid #8fcf9f}
@@ -115,6 +126,7 @@ details.howto ul{margin:0 18px 14px;padding-left:22px;line-height:1.6}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <link rel="stylesheet" href="https://itsdrdan.github.io/games/brand/itsdrdan.css">
+<script src="https://itsdrdan.github.io/games/brand/chemparse.v2.js"></script><!-- shared number reading (never edited; a change is a new version) -->
 <script src="https://itsdrdan.github.io/games/track.js" defer></script>
 <script src="https://itsdrdan.github.io/games/brand/embed.js" defer></script>
 </head><body>
@@ -131,7 +143,7 @@ details.howto ul{margin:0 18px 14px;padding-left:22px;line-height:1.6}
 <details class="howto"><summary>📘 How to use this game</summary><ul>
  <li><b>Start with 🎢 Ride Line</b> to see equilibrium as a theme-park line, then try the 🔬 Particle Lab.</li>
  <li>Gold boxes say <b>👉 what to do in the lab</b>. Do it, watch, then answer.</li><li>In the labs, particles bounce like billiard balls. A colored ring means that hit was a reaction; most hits just bounce.</li>
- <li><b>💡 Hint</b> gives a clue. <b>👀 Show Answer</b> reveals it but earns no point.</li></ul></details>
+ <li><b>🧮 Calculate K</b> takes typed numbers (6.02E23 works). <b>🎯 Skill Check</b> gives you a study plan.</li><li><b>💡 Hint</b> gives a clue. <b>👀 Show Answer</b> reveals it but earns no point.</li></ul></details>
 <nav class="modes" id="modes" aria-label="Choose a mode"></nav>
 <div class="main">
 <section class="card" id="practice">
@@ -317,11 +329,14 @@ const MODES=[
  {id:'ride',title:'Ride Line',short:'Equilibrium as a theme-park line',icon:'🎢',mb:'#fff0e3',ma:'#e8955a'},
  {id:'lab',title:'Particle Lab',short:'Stress real reactions and watch',icon:'🔬',mb:'#e6f2ff',ma:'#5d9fd2'},
  {id:'shift',title:'Shift It!',short:'Le Châtelier predictions',icon:'↔️',mb:'#e7f6e9',ma:'#6fae7e'},
- {id:'ideas',title:'Big Ideas & K',short:'Dynamic equilibrium, K expressions',icon:'🧠',mb:'#f1eafb',ma:'#9a7fcf'}];
+ {id:'ideas',title:'Big Ideas & K',short:'Dynamic equilibrium, K expressions',icon:'🧠',mb:'#f1eafb',ma:'#9a7fcf'},
+ {id:'calc',title:'Calculate K',short:'Find K or a missing concentration',icon:'🧮',mb:'#fff6e2',ma:'#c99a2e',noArt:true},
+ {id:'quiz',title:'Skill Check',short:'10 questions, then your study plan',icon:'🎯',mb:'#fdeef2',ma:'#d0708a',noArt:true}];
 const VIDEO_FOR={
  basics:['qatdA_ALnx8',0,'What is equilibrium?'],rates:['qatdA_ALnx8',683,'Rates must be equal at equilibrium'],
  kexpr:['-ie15qDdHjE',236,'The equilibrium constant, K'],krules:['-ie15qDdHjE',472,'Rules behind K'],hetero:['ZojNOgXleJA',731,'Heterogeneous equilibrium expressions'],
  collide:['qatdA_ALnx8',130,'Collision theory basics'],
+ calc:['ZojNOgXleJA',1238,'Practice: finding a concentration from K'],kcalc:['JbkiO-RLx6A',0,'Practice problems for equilibrium (Keq)'],
  lec:['JMRz9TRVUQg',0,"Le Châtelier's principle: stress!"],lecAdd:['JMRz9TRVUQg',304,'Adding concentration = move away'],lecRem:['JMRz9TRVUQg',427,'Taking concentration = move toward'],
  lecT:['JMRz9TRVUQg',719,'Temperature: exothermic and endothermic'],lecP:['JMRz9TRVUQg',992,'Pressure change'],lecV:['JMRz9TRVUQg',1409,'Volume changes'],lecCat:['JMRz9TRVUQg',1495,'Catalysts and enzymes'],
  lecReal:['JMRz9TRVUQg',82,'Real-world examples'],practice:['ZojNOgXleJA',986,"Practice: predicting Le Châtelier shifts"]};
@@ -794,6 +809,61 @@ const IDEAS=[
 /* ============================== GENERATORS ============================== */
 let lastPick={};
 function pickNew(key,list){let i,tries=0;do{i=Math.floor(Math.random()*list.length)}while(list.length>1&&i===lastPick[key]&&tries++<10);lastPick[key]=i;return list[i]}
+/* ============================== CALCULATE K (typed numbers) ============================== */
+/* Shared number reader: games/brand/chemparse.v2.js. If it did not load, use a small local copy so the mode still works. */
+const NUM=window.ChemParse||(()=>{const SU={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁻':'-','⁺':'+'};
+ const base=r=>String(r??'').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺]/g,c=>SU[c]).replace(/[−–—]/g,'-').replace(/\s+/g,'');
+ const decimalComma=r=>{const t=String(r??'').replace(/\s+/g,'');return t.includes(',')&&!/^[+-]?[1-9]\d{0,2}(,\d{3})+(\.\d*)?([eE×xX*·].*)?$/.test(t)};
+ const norm=r=>base(r).replace(/,/g,'').replace(/[×xX*·]10\^?([+-]?\d+)$/,'e$1');
+ const parseValue=r=>{if(decimalComma(r))return NaN;const t=norm(r);return /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(t)?Number(t):NaN};
+ const sfCount=r=>{let t=base(r).replace(/,/g,'').replace(/(?:[×xX*·]10\^?|[eE])[+-]?\d+$/,'').replace(/^[+-]/,'');if(!/^(?:\d+\.?\d*|\.\d+)$/.test(t))return 0;t=t.replace(/^0+(?=\d)/,'');if(/^0*\.?0*$/.test(t))return 1;return t.includes('.')?t.replace('.','').replace(/^0+/,'').length:t.replace(/0+$/,'').length};
+ const fmt=(x,s)=>{if(!isFinite(x))return '—';if(x===0)return '0';const r=Number(x.toPrecision(s)),e=Math.floor(Math.log10(Math.abs(r)));if(e>=5||e<-3||(e>=s&&String(Math.round(r)).replace(/0+$/,'').length<s)||(e>=s-1&&e>=s)){const [m,p]=r.toExponential(s-1).split('e');return m+' × 10'+String(+p).replace(/[0-9-]/g,c=>c==='-'?'⁻':'⁰¹²³⁴⁵⁶⁷⁸⁹'[c])}let f=r.toFixed(Math.max(0,s-1-e));if(!f.includes('.')&&/0$/.test(f)&&sfCount(f)!==s)f+='.';return f};
+ return {decimalComma,parseValue,sfCount,fmt}})();
+const nf=(x,s)=>NUM.fmt(x,s);
+const CALC_IDS=['haber','so3','no2','hi','pcl5','caco3','co','no','meth','fescn','nh4hs','soda','blood','hb'];
+const inK=e=>e[2]==='g'||e[2]==='aq';
+/* a measured concentration: 2 or 3 sig figs, 0.010–9.9 M */
+function rconc(){const sf=pick([2,3,3]),e=pick([-2,-1,-1,0]);const v=Number((rnd(11,95)/10*10**e).toPrecision(sf));return {v,sf}}
+function kOf(r,c){let num=1,den=1;r.R.filter(inK).forEach(e=>num*=c[e[1]]**e[0]);r.L.filter(inK).forEach(e=>den*=c[e[1]]**e[0]);return num/den}
+function kVariant(r,c,how){let num=1,den=1;const t=(e)=>how==='noexp'?c[e[1]]:how==='mult'?c[e[1]]*e[0]:c[e[1]]**e[0];
+ r.R.filter(inK).forEach(e=>num*=t(e));r.L.filter(inK).forEach(e=>den*=t(e));if(how==='sum'){num=0;den=0;r.R.filter(inK).forEach(e=>num+=c[e[1]]**e[0]);r.L.filter(inK).forEach(e=>den+=c[e[1]]**e[0])}return num/den}
+const brk=e=>`[${e[1]}]${e[0]>1?`<sup>${e[0]}</sup>`:''}`;
+const kForm=r=>`K<sub>c</sub> = ${frac(r.R.filter(inK).map(brk).join(''),r.L.filter(inK).map(brk).join(''))}`;
+function calcQ(kind){const id=pick(CALC_IDS),r=RX.find(x=>x.id===id);kind=kind||(Math.random()<0.5?'kc':Math.random()<0.8?'unknown':'rev');
+ const all=[...r.L,...r.R].filter(inK),c={},sfs={};all.forEach(e=>{const g=rconc();c[e[1]]=g.v;sfs[e[1]]=g.sf});
+ const het=[...r.L,...r.R].some(e=>!inK(e));const hetNote=het?' Pure solids and liquids are left out.':'';
+ if(kind==='kc'){const K=kOf(r,c),sf=Math.min(...all.map(e=>sfs[e[1]]));if(!isFinite(K)||K===0)return calcQ('kc');
+  const giv=all.map(e=>`<span>[${e[1]}] = ${nf(c[e[1]],sfs[e[1]])} M</span>`).join('');
+  return {type:'num',topic:'calc',video:'kcalc',answer:K,sf,unit:'',prompt:`These are the <b>equilibrium</b> concentrations. Calculate K<sub>c</sub>.`,
+   html:rxHTML(r,false)+`<div class="givens">${giv}</div>`,
+   hint:`Write the expression first: ${kForm(r)}.${hetNote} Then plug in and raise each concentration to its coefficient. Round to ${sf} sig figs (the fewest in the data).`,
+   why:`${kForm(r)}${hetNote}<br>K<sub>c</sub> = ${frac(r.R.filter(inK).map(e=>`(${nf(c[e[1]],sfs[e[1]])})${e[0]>1?`<sup>${e[0]}</sup>`:''}`).join(''),r.L.filter(inK).map(e=>`(${nf(c[e[1]],sfs[e[1]])})${e[0]>1?`<sup>${e[0]}</sup>`:''}`).join(''))} = <b>${nf(K,sf)}</b>`,
+   slips:[[1/K,'That is upside down: K is <b>products over reactants</b>.'],[kVariant(r,c,'noexp'),'Each concentration must be raised to its <b>coefficient</b> as an exponent.'],[kVariant(r,c,'mult'),'Coefficients become <b>exponents</b>, not numbers you multiply by.'],[kVariant(r,c,'sum'),'Multiply the concentrations together; don\'t add them.']]}}
+ if(kind==='unknown'){const cand=all.filter(e=>e[0]<=2);if(!cand.length||all.length<2)return calcQ('kc');const u=pick(cand);
+  const K0=kOf(r,c);if(!isFinite(K0)||K0===0)return calcQ('unknown');const Ksf=pick([2,3]),K=Number(K0.toPrecision(Ksf));
+  const onP=r.R.includes(u);let rest=1;all.filter(e=>e!==u).forEach(e=>{const t=c[e[1]]**e[0];rest*=r.R.includes(e)?t:1/t});
+  /* K = rest × u^n (u on product side) or rest / u^n (reactant side) */
+  const un=onP?K/rest:rest/K,x=un**(1/u[0]),sf=Math.min(Ksf,...all.filter(e=>e!==u).map(e=>sfs[e[1]]));
+  const giv=all.filter(e=>e!==u).map(e=>`<span>[${e[1]}] = ${nf(c[e[1]],sfs[e[1]])} M</span>`).join('');
+  return {type:'num',topic:'calc',video:'calc',answer:x,sf,unit:'M',prompt:`K<sub>c</sub> = <b>${nf(K,Ksf)}</b>. Use the equilibrium concentrations to find <b>[${u[1]}]</b>.`,
+   html:rxHTML(r,false)+`<div class="givens">${giv}</div>`,
+   hint:`Write ${kForm(r)}, plug in what you know, and solve for [${u[1]}].${u[0]>1?' Its exponent is 2, so take the <b>square root</b> at the end.':''}${hetNote} Round to ${sf} sig figs.`,
+   why:`${kForm(r)}${hetNote}<br>Rearranged: [${u[1]}]${u[0]>1?'<sup>2</sup>':''} = ${onP?'K × (reactant terms) ÷ (other product terms)':'(product terms) ÷ (K × other reactant terms)'} ${u[0]>1?`= ${nf(un,sf)} → [${u[1]}] = √${nf(un,sf)} = <b>${nf(x,sf)} M</b>`:`= <b>${nf(x,sf)} M</b>`}`,
+   slips:[[un,u[0]>1?'Almost: that is [X]². Take the <b>square root</b>.':''],[onP?rest/K:K/rest,'Check the rearranging: you divided where you should multiply (or the reverse).'],[(onP?rest/K:K/rest)**(1/u[0]),'Check the rearranging: is your unknown on top (product) or bottom (reactant)?']].filter(z=>z[1])}}
+ const K=Number((rnd(11,95)/10*10**pick([-4,-3,-2,-1,1,2,3])).toPrecision(2));
+ return {type:'num',topic:'kexpr',video:'krules',answer:1/K,sf:2,unit:'',prompt:`K<sub>c</sub> = <b>${nf(K,2)}</b> for the reaction below. What is K<sub>c</sub> for the <b>reverse</b> reaction?`,html:rxHTML(r,false),
+  hint:'Reversing the reaction flips the expression upside down, so K<sub>reverse</sub> = 1 / K.',why:`K<sub>reverse</sub> = 1 / K = 1 / (${nf(K,2)}) = <b>${nf(1/K,2)}</b>`,
+  slips:[[K,'Reversing the reaction flips the fraction, so the value changes to 1/K.'],[-K,'K is never negative. Use 1/K.']]}}
+/* ============================== SKILL CHECK ============================== */
+const TOPICS={dyn:['Dynamic equilibrium and rates','ideas','basics'],kexpr:['Writing K expressions','ideas','kexpr'],kmag:['What the size of K means','ideas','kexpr'],
+ conc:['Le Châtelier: adding or removing a substance','shift','lecAdd'],temp:['Le Châtelier: temperature','shift','lecT'],press:['Le Châtelier: volume, pressure and catalysts','shift','lecP'],
+ apply:['Equilibrium in real life (medicine, industry)','shift','lecReal'],calc:['Calculating K and concentrations','calc','calc']};
+const QUIZ_PLAN=['dyn','dyn','kexpr','kmag','conc','temp','press','apply','calc','calc'];
+function topicQ(t){const sOf=types=>{for(let k=0;k<40;k++){const r=pick(RX),ss=stressesFor(r).filter(x=>types.includes(x.t));if(ss.length){const q=shiftDir(r,pick(ss));q.lab=null;return q}}};
+ let q;switch(t){case'dyn':{const it=pick(IDEAS.slice(0,7));q=Math.random()<0.75?mc({video:it.v,prompt:it.p,hint:it.h,choices:it.c}):graphQ();break}
+  case'kexpr':q=kExprQ();break;case'kmag':q=kMagQ();break;case'conc':q=sOf(['add','rem']);break;case'temp':q=sOf(['heat','cool']);break;
+  case'press':q=sOf(['comp','exp','cat','addS']);break;case'apply':q=appQ();break;default:q=calcQ(Math.random()<0.55?'kc':'unknown')}
+ q.topic=t;return q}
 const GEN={
  ride(){return Object.assign(mc(pickNew('ride',RIDE_Q)()),{lab:{kind:'park'}})},
  lab(){const want=state.labSys;const pool=LAB_Q.filter(x=>!want||x.sys===want);const it=pickNew('lab'+(want||''),pool);return Object.assign(mc(it.f()),{lab:{kind:'eq',sys:it.sys}})},
@@ -804,6 +874,8 @@ const GEN={
   if(roll<0.72)return shiftSpecies(r,ss);
   if(roll<0.84&&r.dH!=null)return shiftK(r,ss);
   return shiftWhich(r,ss)},
+ calc(){return calcQ()},
+ quiz(){const Q=state.quiz;return topicQ(Q&&!Q.over?Q.plan[Q.i]:pick(QUIZ_PLAN))},
  ideas(){const roll=Math.random();
   if(roll<0.36){const it=pickNew('ideas',IDEAS);return mc({video:it.v,prompt:it.p,hint:it.h,choices:it.c})}
   if(roll<0.62)return kExprQ();if(roll<0.76)return kMagQ();if(roll<0.86)return kRevQ();return graphQ()}};
@@ -930,15 +1002,16 @@ const JK=GAME_KEY+'-journey',jBlank=()=>({xp:0,correct:0,best:0,modes:{},badges:
 const BADGES=[['first','🌱 First Answer','Answer a question',j=>j.correct>=1],['ten','🔟 Ten Correct','10 on your own',j=>j.correct>=10],['fifty','🏅 Fifty Correct','50 on your own',j=>j.correct>=50],
  ['s5','🔥 Hot Streak','5 in a row',j=>j.best>=5],['s10','⚡ On Fire','10 in a row',j=>j.best>=10],
  ['ride','🎢 Ride Operator','5 in Ride Line',j=>(j.modes.ride||0)>=5],['lab','🔬 Lab Scientist','5 in Particle Lab',j=>(j.modes.lab||0)>=5],['shift','↔️ Le Châtelier Pro','10 in Shift It!',j=>(j.modes.shift||0)>=10],['ideas','🧠 Big Thinker','10 in Big Ideas',j=>(j.modes.ideas||0)>=10],
+ ['calc','🧮 K Calculator','5 in Calculate K',j=>(j.modes.calc||0)>=5],['quiz','🎯 Skill Check Star','8+ on a Skill Check',j=>(j.bestQuiz||0)>=8],
  ['all','🧭 Explorer','Every mode',j=>MODES.every(m=>j.modes[m.id])]];
 function renderJ(){const l=Math.floor(J.xp/100)+1,i=J.xp%100;$('jChip').textContent=`Level ${l} • ${J.xp} XP`;$('lvl').textContent='Level '+l;$('xpFill').style.width=i+'%';$('xpTxt').textContent=i+' / 100 XP';
- $('badges').innerHTML=BADGES.map(([id,t,d])=>`<div class="bdg ${J.badges[id]?'got':''}"><img src="assets/ach-${id}.webp" alt="" loading="lazy"><span><b>${t}</b>${d}</span></div>`).join('')}
+ $('badges').innerHTML=BADGES.map(([id,t,d])=>`<div class="bdg ${J.badges[id]?'got':''}"><img src="assets/ach-${id}.webp" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${t.split(' ')[0]}',style:'font-size:30px;text-align:center'}))"><span><b>${t}</b>${d}</span></div>`).join('')}
 function award(assisted){const before=Math.floor(J.xp/100);if(assisted)J.xp+=2;else{J.xp+=10+Math.min(state.streak,5)*2;J.correct++;J.best=Math.max(J.best,state.streak);J.modes[state.mode]=(J.modes[state.mode]||0)+1}
  BADGES.forEach(([id,t,,ok])=>{if(!J.badges[id]&&ok(J)){J.badges[id]=1;toast('Badge earned: '+t)}});if(Math.floor(J.xp/100)>before)toast('Level up!');try{localStorage.setItem(JK,JSON.stringify(J))}catch(e){}renderJ()}
 function stats(){[['nCorrect',state.correct],['nStreak',state.streak],['nAssist',state.assist]].forEach(([id,v])=>{const e=$(id);if(e.textContent!==String(v)){e.textContent=v;const p=e.parentElement;p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop')}})}
 function fb(k,h){$('fb').className='fb '+k;$('fb').innerHTML=h}
-function log(ok){if(state.logged)return;state.logged=true;try{window.ddTrack&&ddTrack({game:'equilibrium',course:'3A',mode:MODES.find(m=>m.id===state.mode).title,topic:state.q.video||'',correct:!!ok})}catch(e){}}
-function buildModes(){$('modes').innerHTML=MODES.map(m=>`<button type="button" class="mode ${m.id===state.mode?'on':''}" aria-pressed="${m.id===state.mode}" data-m="${m.id}" style="--mb:${m.mb};--ma:${m.ma}"><span class="ic art"><img src="assets/mode-${m.id}.webp" alt="" onerror="this.parentNode.classList.remove('art');this.parentNode.textContent='${m.icon}'"></span><b>${m.title}</b><small>${m.short}</small></button>`).join('');
+function log(ok){if(state.logged)return;state.logged=true;try{window.ddTrack&&ddTrack({game:'equilibrium',course:'3A',mode:MODES.find(m=>m.id===state.mode).title,topic:state.q.topic||state.q.video||'',correct:!!ok})}catch(e){}}
+function buildModes(){$('modes').innerHTML=MODES.map(m=>`<button type="button" class="mode ${m.id===state.mode?'on':''}" aria-pressed="${m.id===state.mode}" data-m="${m.id}" style="--mb:${m.mb};--ma:${m.ma}">${m.noArt?`<span class="ic">${m.icon}</span>`:`<span class="ic art"><img src="assets/mode-${m.id}.webp" alt="" onerror="this.parentNode.classList.remove('art');this.parentNode.textContent='${m.icon}'"></span>`}<b>${m.title}</b><small>${m.short}</small></button>`).join('');
  $('modes').querySelectorAll('.mode').forEach(b=>b.onclick=()=>{state.mode=b.dataset.m;ui.mode=state.mode;saveUI();buildModes();next()})}
 /* the lab element persists between questions of the same kind/system so students can keep experimenting */
 const labHost=document.createElement('div');let mounted=null;
@@ -949,29 +1022,66 @@ function taskEvent(ev){const t=state.q&&state.q.task;if(!t||state.taskOk||state.
 function tickTask(){const t=state.q.task,el=$('taskBox');if(!el)return;{const now=performance.now(),last=tickTask.last||now;tickTask.last=now;if(SPEED.f()===0)state.taskAt+=now-last;else if(SPEED.f()<1)state.taskAt+=(now-last)*(1-SPEED.f())*0.5}const wait=t.need==='watch'?t.sec*1000:2500,left=Math.max(0,wait-(performance.now()-state.taskAt));
  if(left<=0){state.taskOk=true;el.className='task done';el.innerHTML='✅ Done! Now answer below.';['checkBtn'].forEach(id=>$(id).disabled=false);return}
  const tt=SPEED.f()===0?'⏸ Paused: tap ⏸ Paused to play again':`⏳ Watch… ${Math.ceil(left/1000)} s`;if(el.textContent!==tt)el.textContent=tt;clearTimeout(tickTask.t);tickTask.t=setTimeout(tickTask,250)}
-function next(){clearTimeout(tickTask.t);const q=GEN[state.mode]();state.q=q;state.sel=null;state.done=false;state.logged=false;state.taskPend=false;$('modeTitle').textContent=MODES.find(m=>m.id===state.mode).title;
+function startQuiz(){state.quiz={plan:shuf(QUIZ_PLAN.slice(0,2)).concat(shuf(QUIZ_PLAN.slice(2,8)),QUIZ_PLAN.slice(8)),i:0,res:[],over:false}}
+function quizSummary(){const Q=state.quiz,n=Q.res.filter(r=>r.ok).length;Q.over=true;J.bestQuiz=Math.max(J.bestQuiz||0,n);try{localStorage.setItem(JK,JSON.stringify(J))}catch(e){}
+ BADGES.forEach(([id,t,,ok])=>{if(!J.badges[id]&&ok(J)){J.badges[id]=1;toast('Badge earned: '+t)}});renderJ();
+ const miss={};Q.res.forEach(r=>{if(!r.ok)miss[r.topic]=(miss[r.topic]||0)+1});
+ const rows=Object.keys(TOPICS).filter(t=>Q.res.some(r=>r.topic===t)).map(t=>{const R=Q.res.filter(r=>r.topic===t),k=R.filter(r=>r.ok).length;return `<tr><td>${k===R.length?'✅':'❌'}</td><td>${TOPICS[t][0]}</td><td>${k} / ${R.length}</td></tr>`}).join('');
+ const plan=Object.keys(miss).map(t=>`<div class="item"><b>📌 ${TOPICS[t][0]}</b><br><button type="button" class="btn hint" data-go="${t}">Practice this</button><button type="button" class="btn show" data-vid="${t}">🎥 Watch Dr. Dan</button></div>`).join('');
+ const msg=n>=9?'🌟 Excellent! You are ready.':n>=7?'👍 Solid. Review the topics below.':n>=5?'📚 Getting there. Practice the topics below, then try again.':'🧭 Start with the topics below; the 🎢 Ride Line and 🔬 Particle Lab help a lot.';
+ $('qArea').innerHTML=`<div class="qsum"><p class="prompt">Skill Check complete</p><div class="big">${n} / ${Q.res.length}</div><p>${msg}</p><table>${rows}</table>
+  <h3 style="margin:14px 0 4px">Your study plan</h3>${plan?`<div class="plan">${plan}</div>`:'<p>Nothing to review: every topic was right. Try another Skill Check to be sure!</p>'}
+  <button type="button" class="btn check" id="againBtn" style="margin-top:14px">🎯 Start a new Skill Check</button></div>`;
+ ['checkBtn','hintBtn','showBtn'].forEach(id=>$(id).disabled=true);fb('','');$('newBtn').textContent='New Skill Check ↻';$('practice').classList.add('quizdone');$('modeTitle').textContent='Skill Check results';
+ $('qArea').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{state.mode=TOPICS[b.dataset.go][1];ui.mode=state.mode;saveUI();buildModes();next();$('practice').scrollIntoView({behavior:'smooth'})});
+ $('qArea').querySelectorAll('[data-vid]').forEach(b=>b.onclick=()=>{state.q={video:TOPICS[b.dataset.vid][2]};video();openVideo()});
+ $('againBtn').onclick=()=>{startQuiz();next()};$('againBtn').focus({preventScroll:true})}
+function next(){clearTimeout(tickTask.t);
+ $('practice').classList.toggle('quizmode',state.mode==='quiz');$('practice').classList.remove('quizdone');$('newBtn').textContent='New Question ↻';
+ if(state.mode==='quiz'){if(!state.quiz||state.quiz.over)startQuiz();else if(state.done&&state.q&&state.q.qi===state.quiz.i)state.quiz.i++;
+  if(state.quiz.i>=state.quiz.plan.length){Lab.stop();Park.stop();state.q={};state.done=true;return quizSummary()}$('newBtn').textContent='Next question →'}
+ const q=GEN[state.mode]();if(state.mode==='quiz'){q.qi=state.quiz.i}state.q=q;state.sel=null;state.done=false;state.logged=false;state.taskPend=false;$('modeTitle').textContent=MODES.find(m=>m.id===state.mode).title+(state.mode==='quiz'?` · ${state.quiz.i+1} of ${state.quiz.plan.length}`:'');
  $('hintBox').className='hintbox';fb('','');
  const sysPick=state.mode==='lab'?`<div class="ctrls" role="group" aria-label="Choose a reaction">${LAB_SYS.map(([k,l])=>`<button type="button" class="chip ${q.lab&&q.lab.sys===k?'on':''}" aria-pressed="${q.lab&&q.lab.sys===k}" data-sys="${k}">${l}</button>`).join('')}</div>`:'';
- let h=sysPick+`<p class="prompt">${q.prompt}</p>`;
+ let h=sysPick+(state.mode==='quiz'?`<div class="qprog" aria-hidden="true">${state.quiz.plan.map((t,i)=>`<i class="${i<state.quiz.res.length?(state.quiz.res[i].ok?'ok':'no'):i===state.quiz.i?'now':''}"></i>`).join('')}</div><p class="tip">One try per question. No hints until the end.</p>`:'')+`<p class="prompt">${q.prompt}</p>`;
  if(q.task)h+=`<div class="task" id="taskBox" role="status" aria-live="polite">👉 ${q.task.say}</div>`;
  if(q.html&&!(q.lab&&q.lab.demo))h+=`<div class="qbox">${q.html}</div>`;
  if(q.lab)h+=`<div id="labHere"></div>${q.lab.demo?'<p class="tip">🔬 This lab is at equilibrium. Answer first; then we\'ll make the change so you can watch it.</p>':''}`;
- h+=`<div class="options">${q.options.map((o,i)=>`<button type="button" class="opt" aria-pressed="false" data-i="${i}"><span class="L" aria-hidden="true">${i+1}</span><span>${o}</span></button>`).join('')}</div>`;
+ if(q.type==='num')h+=`<div class="numrow"><label for="numIn" class="sr-only" style="position:absolute;left:-9999px">Your answer</label><input id="numIn" class="num" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your answer">${q.unit?`<span class="unit">${q.unit}</span>`:''}<button type="button" class="chip ins" data-ins="E" aria-label="×10ⁿ: insert E for times ten to the power">×10ⁿ</button><button type="button" class="chip ins" data-ins="-" aria-label="− minus sign">−</button></div><p class="tip">Round to <b>${q.sf} significant figures</b>. Scientific notation: tap <b>×10ⁿ</b> (or type E), like <span style="white-space:nowrap">2.6E-4</span> for 2.6 × 10⁻⁴.</p>`;
+ else h+=`<div class="options">${q.options.map((o,i)=>`<button type="button" class="opt" aria-pressed="false" data-i="${i}"><span class="L" aria-hidden="true">${i+1}</span><span>${o}</span></button>`).join('')}</div>`;
  $('qArea').innerHTML=h;['checkBtn','hintBtn','showBtn'].forEach(id=>$(id).disabled=false);
  if(q.lab){$('labHere').appendChild(labHost);const L=ensureLab(q.lab)}else{Lab.stop();Park.stop();mounted=null}
  state.taskOk=!q.task;if(q.task){$('checkBtn').disabled=true;if(q.task.need==='watch'){state.taskAt=performance.now();tickTask.last=0;tickTask()}}
+ /* ×10ⁿ and − buttons: the iPhone number keypad has no E or minus key. Keep the keypad open (no focus change) and add to the end. */
+ $('qArea').querySelectorAll('[data-ins]').forEach(b=>{const keep=e=>e.preventDefault();b.addEventListener('pointerdown',keep);b.addEventListener('mousedown',keep);
+  b.onclick=()=>{const n=$('numIn');if(!n||n.readOnly)return;/* always add at the end: iOS reports a stale cursor for number inputs */n.value+=b.dataset.ins;n.focus();const L=n.value.length;try{n.setSelectionRange(L,L)}catch(e){}}});
  $('qArea').querySelectorAll('[data-sys]').forEach(b=>b.onclick=()=>{state.labSys=b.dataset.sys;next()});
  $('qArea').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(state.done)return;state.sel=q.options[+b.dataset.i];$('qArea').querySelectorAll('.opt').forEach(x=>{x.classList.toggle('sel',x===b);x.setAttribute('aria-pressed',x===b);x.classList.remove('wrong')})});
  video();stats()}
 function whyList(q){const others=q.options.filter(o=>o!==q.answer&&q.whys[o]);return others.length?`<ul class="why">${others.map(o=>`<li>❌ <b>${o}</b>: ${q.whys[o]}</li>`).join('')}</ul>`:''}
-function finish(revealed){state.done=true;['checkBtn','hintBtn','showBtn'].forEach(id=>$(id).disabled=true);const q=state.q;
+function finish(revealed,quizWrong){state.done=true;['checkBtn','hintBtn','showBtn'].forEach(id=>$(id).disabled=true);const q=state.q;if($('numIn'))$('numIn').readOnly=true;
+ if(state.mode==='quiz'&&state.quiz&&state.q.qi===state.quiz.i&&state.quiz.res.length===state.quiz.i)state.quiz.res.push({topic:q.topic,ok:!revealed&&!quizWrong});
+ if(state.mode==='quiz'){const last=state.quiz.i+1>=state.quiz.plan.length;$('newBtn').textContent=last?'See my results →':'Next question →'}
+ const ansTxt=q.type==='num'?`${nf(q.answer,q.sf)}${q.unit?' '+q.unit:''}`:q.answer;
+ if(quizWrong){$('qArea').querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(q.options[+b.dataset.i]===q.answer)b.classList.add('right')});state.streak=0;log(false);stats();
+  fb('bad',`❌ Not this time. The answer is <b>${ansTxt}</b>.<br>${q.why}${q.type==='mc'?whyList(q):''}`);return}
  $('qArea').querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(q.options[+b.dataset.i]===q.answer)b.classList.add('right')});
  let demo='';if(q.lab&&q.lab.demo){Lab.apply(q.lab.demo);demo=`<br>🔬 <b>Watch the lab above:</b> we just made that change. See the balance beam tip, then level off.`}
- if(revealed){state.assist++;state.streak=0;log(false);fb('good',`👀 <b>${q.answer}</b><br>${q.why}${demo}${whyList(q)}<br><small>Assisted: no point this time. <button class="linkbtn" onclick="openVideo()">🎥 Review with Dr. Dan</button></small>`);award(true)}
- else{state.correct++;state.streak++;log(true);confetti();fb('good','✅ Correct! '+q.why+demo+whyList(q));award(false)}stats();
+ if(revealed){state.assist++;state.streak=0;log(false);fb('good',`👀 <b>${ansTxt}</b><br>${q.why}${demo}${q.type==='mc'?whyList(q):''}<br><small>Assisted: no point this time. <button class="linkbtn" onclick="openVideo()">🎥 Review with Dr. Dan</button></small>`);award(true)}
+ else{state.correct++;state.streak++;log(true);confetti();fb('good','✅ Correct! '+q.why+demo+(q.type==='mc'?whyList(q):''));award(false)}stats();
  const a=document.activeElement;if(!a||a===document.body||a.disabled)$('newBtn').focus({preventScroll:true})}
+function checkNum(q){const raw=$('numIn').value.trim();if(!raw)return fb('bad','Type your answer first.');
+ if(NUM.decimalComma(raw))return fb('bad','Use a period for decimals (type 1.5, not 1,5). Commas only for thousands, like 1,200.');
+ const v=NUM.parseValue(raw);if(!isFinite(v))return fb('bad','Type one number, like 54.1 or 2.9E-32.');
+ const close=(a,b)=>Math.abs(a-b)<=Math.abs(b)*0.012+1e-300,target=Number(q.answer.toPrecision(q.sf));
+ if(close(v,q.answer)||close(v,target)){if(NUM.sfCount(raw)!==q.sf)return fb('bad',`✏️ Your math is right! Now round to <b>${q.sf} significant figure${q.sf>1?'s':''}</b>. (Trailing zeros only count with a decimal point; use E notation if needed, like 1.20E3.)`);return finish(false)}
+ const slip=(q.slips||[]).find(([x])=>isFinite(x)&&close(v,x)&&!close(x,q.answer));
+ if(state.mode==='quiz')return finish(false,true);
+ state.streak=0;log(false);stats();return fb('bad',`🔎 Not quite. ${slip?slip[1]+' ':''}<br>💡 ${q.hint}`)}
 function check(){if(state.done)return;const q=state.q;if(!state.taskOk)return fb('bad','👉 Do the lab step in the gold box first, then answer.');
+ if(q.type==='num')return checkNum(q);
  if(!state.sel)return fb('bad','Choose an answer first.');
+ if(state.sel!==q.answer&&state.mode==='quiz'){const i=q.options.indexOf(state.sel);$('qArea').querySelector(`.opt[data-i="${i}"]`)?.classList.add('wrong');return finish(false,true)}
  if(state.sel!==q.answer){state.streak=0;log(false);stats();const i=q.options.indexOf(state.sel);$('qArea').querySelector(`.opt[data-i="${i}"]`)?.classList.add('wrong');const w=q.whys[state.sel];state.sel=null;return fb('bad',`🔎 Not quite. ${w?w+' ':''}<br>💡 ${q.hint}`)}
  finish(false)}
 function hint(){if(state.done)return;$('hintBox').innerHTML='💡 '+state.q.hint+(VIDEO_FOR[state.q.video]?` <button class="linkbtn" onclick="openVideo()">🎥 Watch Dr. Dan explain it</button>`:'');$('hintBox').className='hintbox on'}
@@ -982,10 +1092,10 @@ function video(){const v=VIDEO_FOR[state.q?.video];const src=v?`https://www.yout
 function openVideo(){$('videoPanel').open=true;$('player').src=$('player').dataset.want;$('videoPanel').scrollIntoView({behavior:'smooth',block:'center'})}
 $('videoPanel').addEventListener('toggle',()=>{if($('videoPanel').open&&!$('player').src)$('player').src=$('player').dataset.want});
 $('refBody').innerHTML=REFERENCE.map(([t,d])=>`<div class="refcard"><b>${t}</b><div>${d}</div></div>`).join('');
-$('checkBtn').onclick=check;$('hintBtn').onclick=hint;$('showBtn').onclick=()=>{if(!state.done){if(!state.taskOk){state.taskOk=true}finish(true)}};$('newBtn').onclick=next;
+$('checkBtn').onclick=check;$('hintBtn').onclick=hint;$('showBtn').onclick=()=>{if(!state.done){if(!state.taskOk){state.taskOk=true}finish(true)}};$('newBtn').onclick=()=>{if(state.mode==='quiz'&&state.quiz&&!state.quiz.over&&!state.done)return fb('bad','Answer this question first. (Each question gets one try.)');next()};
 {let armed=0;$('resetBtn').onclick=()=>{if(!armed){$('resetBtn').textContent='Tap again to confirm';armed=setTimeout(()=>{armed=0;$('resetBtn').textContent='Reset progress'},4000);return}clearTimeout(armed);armed=0;J=jBlank();try{localStorage.setItem(JK,JSON.stringify(J))}catch(e){}$('resetBtn').textContent='Reset progress';renderJ()}}
 if(!matchMedia('(max-width:1000px)').matches){$('journey').open=true;$('videoPanel').open=true}
-document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target.tagName;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.target.isContentEditable)return;
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target.tagName;if(e.target.id==='numIn'&&e.key==='Enter'){e.preventDefault();state.done?$('newBtn').click():check();return}if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.target.isContentEditable)return;
  const bs=[...$('qArea').querySelectorAll('.opt')];if(/^[1-9]$/.test(e.key)&&bs[e.key-1]&&!bs[e.key-1].disabled){bs[e.key-1].click();return}
  if(e.key==='Enter'&&!/^(BUTTON|SUMMARY|A)$/.test(t)){e.preventDefault();state.done?next():check()}});
 /* disabled buttons: stop iOS double-tap zoom */
@@ -994,6 +1104,7 @@ document.addEventListener('touchend',e=>{const b=e.target.closest&&e.target.clos
 function audit(n=300){const bad=[],note=m=>{if(bad.length<40)bad.push(m)};
  for(const m of MODES){for(let i=0;i<n;i++){let q;try{q=GEN[m.id]()}catch(e){note(m.id+': throws '+e.message);break}
   if(!q.prompt||!q.hint||!q.why)note(m.id+': missing prompt/hint/why '+q.prompt);if(q.video&&!VIDEO_FOR[q.video])note(m.id+': unknown video '+q.video);
+  if(q.type==='num'){const sh=nf(q.answer,q.sf);if(!isFinite(q.answer)||q.answer<=0)note(m.id+': bad num answer '+q.answer);else if(NUM.sfCount(sh)!==q.sf||Math.abs(NUM.parseValue(sh)-Number(q.answer.toPrecision(q.sf)))>q.answer*1e-9)note(m.id+': shown answer '+sh+' fails '+q.answer+'/'+q.sf);continue}
   if(!q.options.includes(q.answer))note(m.id+': answer not in options');if(new Set(q.options).size!==q.options.length)note(m.id+': duplicate options '+q.options.join(' | '));
   if(q.options.filter(o=>o!==q.answer).some(o=>!q.whys[o]))note(m.id+': missing wrong reason: '+q.prompt.slice(0,60)+' / '+q.options.filter(o=>!q.whys[o]).join(' | '));
   if(q.lab&&q.lab.kind==='eq'&&!SYS[q.lab.sys])note(m.id+': bad sim '+q.lab.sys)}}
@@ -1004,6 +1115,9 @@ function audit(n=300){const bad=[],note=m=>{if(bad.length<40)bad.push(m)};
  if(MODES.some(x=>x.id===m))state.mode=m;
  if(LAB_SYS.some(([k])=>k===y)){state.labSys=y;if(!m)state.mode='lab'}
  if(m||y)addEventListener('load',()=>setTimeout(()=>{const e=$('modes');if(e)scrollTo(0,e.getBoundingClientRect().top+scrollY-8)},150))})();
+/* The shared Feedback pill (brand/feedback.js) is fixed bottom-right; on phones it covered Show Answer. Hide it while the answer buttons are on screen. */
+(()=>{const row=document.querySelector('.btnrow');if(!row||!('IntersectionObserver' in window))return;let vis=false;const apply=()=>{const f=document.querySelector('.ddfb-float');if(f)f.classList.toggle('eq-hide',vis)};
+ new IntersectionObserver(es=>{vis=es[0].isIntersecting;apply()}).observe(row);new MutationObserver(apply).observe(document.body,{childList:true})})();
 buildModes();renderJ();next();
 </script>
 </body></html>

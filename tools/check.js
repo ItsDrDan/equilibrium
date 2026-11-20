@@ -6,13 +6,23 @@ const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'..',process.argv[2]||'index.html'),'utf8');
 const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
 global.state={labSys:null};
-const code=scripts.slice(0,4).join('\n;\n')+';Object.assign(globalThis,{SYS,RX,GEN:typeof GEN!=="undefined"?GEN:null,stressesFor,shiftOf,demoFor,eqNew,eqRun,eqAvg,eqChange,eqSetT,eqSetV,rideNew,rideStep,rideAdd,mc,RIDE_Q,LAB_Q,IDEAS,kExprQ,kMagQ,kRevQ,graphQ,shiftDir,shiftSpecies,shiftK,shiftWhich,VIDEO_FOR})';
+global.window=global.window||{};
+const code=scripts.slice(0,4).join('\n;\n')+';Object.assign(globalThis,{SYS,RX,GEN:typeof GEN!=="undefined"?GEN:null,stressesFor,shiftOf,demoFor,eqNew,eqRun,eqAvg,eqChange,eqSetT,eqSetV,rideNew,rideStep,rideAdd,mc,RIDE_Q,LAB_Q,IDEAS,kExprQ,kMagQ,kRevQ,graphQ,shiftDir,shiftSpecies,shiftK,shiftWhich,VIDEO_FOR,calcQ,topicQ,QUIZ_PLAN,NUM,nf,kOf,RX2:RX})';
 // GEN is defined in script 4 (const) -> expose by evaluating with a wrapper
 (0,eval)(code.replace('const GEN={','var GEN={'));
 let fails=0,n=0;const bad=m=>{if(fails++<30)console.log('FAIL',m)};
 // 1) questions
-const gens={ride:GEN.ride,lab:GEN.lab,shift:GEN.shift,ideas:GEN.ideas};
-for(const [k,g] of Object.entries(gens))for(let i=0;i<3000;i++){const q=g();n++;
+const gens={ride:GEN.ride,lab:GEN.lab,shift:GEN.shift,ideas:GEN.ideas,calc:GEN.calc,quiz:GEN.quiz};
+// numeric questions: the shown answer must pass sig figs and round-trip; slips must differ from the answer
+for(let i=0;i<6000;i++){const q=calcQ();n++;const sh=nf(q.answer,q.sf);
+ if(!(q.answer>0)||!isFinite(q.answer))bad('calc bad answer '+q.answer+' '+q.prompt);
+ else{if(NUM.sfCount(sh)!==q.sf)bad(`calc shown ${sh} has ${NUM.sfCount(sh)} sf, need ${q.sf}`);if(Math.abs(NUM.parseValue(sh)-Number(q.answer.toPrecision(q.sf)))>q.answer*1e-9)bad(`calc shown ${sh} != ${q.answer}`)}
+ if(/undefined|NaN|Infinity/.test(q.prompt+q.html+q.why+q.hint))bad('calc text: '+q.prompt);
+ (q.slips||[]).forEach(([x,m])=>{if(isFinite(x)&&Math.abs(x-q.answer)<=q.answer*0.012&&m)n++})}
+// hand-checked values from the lecture slides
+{const hi=RX2.find(r=>r.id==='hi');const K=kOf(hi,{'H₂':0.10,'I₂':0.20,'HI':1.04});n++;if(Math.abs(K-54.08)>0.01)bad('slide 17 HI K = '+K);
+ const hb=RX2.find(r=>r.id==='haber');const N2=0.50**2/(0.036*2.0**3);n++;if(Math.abs(kOf(hb,{'N₂':N2,'H₂':2.0,'NH₃':0.50})-0.036)>1e-9)bad('slide 24 rearrangement')}
+for(const [k,g] of Object.entries(gens))for(let i=0;i<3000;i++){const q=g();n++;if(q.type==='num'){if(!q.topic)bad(k+' num no topic');continue}if(k==='quiz'&&!q.topic)bad('quiz item without topic');
  if(!q.options.includes(q.answer))bad(k+' answer missing '+q.prompt);
  if(new Set(q.options).size!==q.options.length)bad(k+' dup options '+q.options);
  if(q.options.filter(o=>o===q.answer).length!==1)bad(k+' answer count');
