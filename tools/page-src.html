@@ -1121,14 +1121,19 @@ function whyList(q){const others=q.options.filter(o=>o!==q.answer&&q.whys[o]);re
 function finish(revealed,quizWrong){state.done=true;['checkBtn','hintBtn','showBtn'].forEach(id=>$(id).disabled=true);const q=state.q;if($('numIn'))$('numIn').readOnly=true;
  if(state.mode==='quiz'&&state.quiz&&state.q.qi===state.quiz.i&&state.quiz.res.length===state.quiz.i)state.quiz.res.push({topic:q.topic,ok:!revealed&&!quizWrong});
  if(state.mode==='quiz'){const last=state.quiz.i+1>=state.quiz.plan.length;$('newBtn').textContent=last?'See my results →':'Next question →'}
- if(q.type==='build'){$('kb')?.classList.add('locked');if(revealed||quizWrong){q.rows.forEach((x,i)=>{q.st[i]={p:x.want,e:x.want==='out'?1:x.coef}});kbSync(q);$('kb').querySelectorAll('.kbrow').forEach(r=>r.classList.add('ok'))}
+ let buildWhy='';
+ if(q.type==='build'){$('kb')?.classList.add('locked');
+  /* Skill Check miss: keep the student's own build on screen, mark each wrong row red and say why, then show the right expression below */
+  if(quizWrong){const errs=kbErrors(q);$('kb').querySelectorAll('.kbrow').forEach((r,i)=>{const bad=errs.some(([j])=>j===i);r.classList.toggle('bad',bad);r.classList.toggle('ok',!bad)});
+   buildWhy=errs.length?`<br><b>What to fix in your expression:</b><ul class="why">${errs.map(([,m])=>`<li>${m}</li>`).join('')}</ul>`:''}
+  else if(revealed){q.rows.forEach((x,i)=>{q.st[i]={p:x.want,e:x.want==='out'?1:x.coef}});kbSync(q);$('kb').querySelectorAll('.kbrow').forEach(r=>r.classList.add('ok'))}
   /* two-step: a correct build continues to the plug-in step (no point yet) */
   if(q.then&&!revealed&&!quizWrong){const n=q.then;n.qi=q.qi;n.topic=n.topic||q.topic;state.q=n;state.done=false;['checkBtn','hintBtn','showBtn'].forEach(id=>$(id).disabled=false);
    const div=document.createElement('div');div.innerHTML=`<p class="prompt"><b>Step 2 of 2:</b> ${n.prompt.replace('These are the <b>equilibrium</b> concentrations. ','')}</p>`+numHTML(n);$('qArea').appendChild(div);wireIns();
    fb('good','✅ Expression right! '+q.why+'<br>Now plug in the concentrations ↓');$('hintBox').className='hintbox';$('numIn').focus({preventScroll:true});video();return}}
  const ansTxt=q.type==='num'?`${nf(q.answer,q.sf)}${q.unit?' '+q.unit:''}`:q.type==='build'?kExpr(q.r):q.answer;
  if(quizWrong){$('qArea').querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(q.options[+b.dataset.i]===q.answer)b.classList.add('right')});state.streak=0;log(false);stats();
-  fb('bad',`❌ Not this time. The answer is <b>${ansTxt}</b>.<br>${q.why}${q.type==='mc'?whyList(q):''}`);return}
+  fb('bad',q.type==='build'?`❌ Not this time.${buildWhy}<b>The right expression:</b> ${q.why}`:`❌ Not this time. The answer is <b>${ansTxt}</b>.<br>${q.why}${q.type==='mc'?whyList(q):''}`);return}
  $('qArea').querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(q.options[+b.dataset.i]===q.answer)b.classList.add('right')});
  let demo='';if(q.lab&&q.lab.demo){Lab.apply(q.lab.demo);demo=`<br>🔬 <b>Watch the lab above:</b> we just made that change. See the balance beam tip, then level off.`}
  if(revealed){state.assist++;state.streak=0;log(false);fb('good',`👀 <b>${ansTxt}</b><br>${q.why}${demo}${q.type==='mc'?whyList(q):''}<br><small>Assisted: no point this time. <button class="linkbtn" onclick="openVideo()">🎥 Review with Dr. Dan</button></small>`);award(true)}
