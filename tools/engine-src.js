@@ -39,6 +39,14 @@ const SYS={
   tint:{sp:'H',mix:[[214,40,80],[240,200,40]],lo:5,hi:15,a:0.34},tintName:'indicator color',tube:'pH indicator',
   look:'a pH indicator in the blood sample: pink-red when basic, yellow when acidic',
   stress:[['remR','😮‍💨 Hyperventilate (blow off CO₂)',{CO2:-0.5}],['addR','🫁 Hold breath / COPD (+CO₂)',{CO2:20}],['addP','🏃 Lactic acid (+H⁺)',{H:12}],['addP2','💉 Bicarbonate IV (+HCO₃⁻)',{HCO3:20}]]},
+ cobalt:{real:'🧪 The classic color demo (and humidity-indicator strips): pink when cool or watery, blue when hot or full of chloride.',title:'Co(H₂O)₆²⁺ + 4 Cl⁻ ⇌ CoCl₄²⁻ + 6 H₂O (pink ⇌ blue)',gas:false,heat:true,dH:1,V0:0.7,
+  eq:[[1,'Co','aq'],[4,'Cl','aq']],eqP:[[1,'CoCl','aq'],[6,'H2O','l']],
+  sp:{Co:{l:'Co(H₂O)₆²⁺',c:'#f2a3c4',e:'#a8457a',r:9},Cl:{l:'Cl⁻ (×4)',eqL:'Cl⁻',c:'#a8d88a',e:'#4f8a35',r:6},CoCl:{l:'CoCl₄²⁻',c:'#3f6fd6',e:'#1c3f8f',r:13}},
+  R:['Co','Cl'],P:['CoCl'],kf:0.0011,kr:0.075,Ef:52000,Er:12000,
+  units:{Co:1,Cl:4,CoCl:1},start:{Co:40,Cl:70,CoCl:0},
+  tint:{sp:'CoCl',ratio:['Co','CoCl'],mix:[[236,96,160],[44,88,220]],a:0.6},tintName:'color',tube:'Test tube',
+  note:'Model: each green bead stands for a group of 4 Cl⁻.',
+  stress:[['addR2','🧂 Add HCl (+Cl⁻)',{Cl:20}],['dil','💧 Add water',{__V:0.3}],['remR2','🥄 Add AgNO₃ (removes Cl⁻)',{Cl:-0.55}]]},
  hb:{real:'⛰️ Climbers, athletes and patients on oxygen: how much O₂ your hemoglobin carries.',title:'Hb + O₂ ⇌ HbO₂ (your blood)',gas:false,heat:false,dH:null,
   eq:[[1,'Hb','aq'],[1,'O2','g']],eqP:[[1,'HbO2','aq']],
   sp:{Hb:{l:'Hb',c:'#7b2f4a',e:'#45142a',r:10},O2:{l:'O₂',c:'#9fd3f2',e:'#3f86b5',r:5.5},HbO2:{l:'HbO₂',c:'#ef4a3c',e:'#9c1d14',r:11}},
@@ -107,12 +115,32 @@ function eqCollide(st,dt){const S=SYS[st.sys],C=24,cols=Math.ceil(eqW(st)/C)+1,g
     const d=Math.sqrt(d2),nx=dx/d,ny=dy/d,rel=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
     const ma=ra*ra,mb=rb*rb,ov=(R-d)/2;a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;
     if(rel>=0)continue;                                      // already moving apart
-    st.coll++;
+    st.coll++;a.aimT=b.aimT=0;
     let r=st.pendF>=1&&eqFits(S.R,a,b);
     if(r){st.pendF--;st.evF++;st.viaColl=(st.viaColl||0)+1;eqTransform(st,r,S.P,1);continue}
     r=st.pendR>=1&&eqFits(S.P,a,b);
     if(r){st.pendR--;st.evR++;st.viaColl=(st.viaColl||0)+1;eqTransform(st,r,S.R,-1);continue}
     const j=2*rel/(ma+mb);a.vx+=j*mb*nx;a.vy+=j*mb*ny;b.vx-=j*ma*nx;b.vy-=j*ma*ny}}}}
+function eqDist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function eqSettle(st,side,key,dir){const S=SYS[st.sys],pk='pend'+key,dk='due'+key,to=dir>0?S.P:S.R;if(st[pk]<1)return;const wait=st.t-(st[dk]||0);
+ if(side.length===1){/* one-particle step: allowed without a collision once it is overdue */
+  let guard=0;while(st[pk]>=1&&(st[pk]>6||wait>0.8)&&guard++<20){if(!eqEvent(st,side,to,dir)){st[pk]=0;break}st[pk]--;st['ev'+key]++;st[dk]=st.t}return}
+ if(wait<0.4)return;
+ /* two-particle step: steer the closest available pairs toward each other (one pair per pending reaction, at most 4 at a time) */
+ const A=st.parts.filter(p=>p.s===side[0]&&!p.dead),B=st.parts.filter(p=>p.s===side[1]&&!p.dead);if(!A.length||!B.length||(side[0]===side[1]&&A.length<2)){st[pk]=0;return}
+ const steering=st.parts.filter(p=>p.aimT&&st.t-p.aimT<1.2).length/2,want=Math.min(4,Math.ceil(st[pk]))-steering;
+ for(let k=0;k<want;k++){let best=null,bd=1e9;
+  for(const a of A){if(a.dead||(a.aimT&&st.t-a.aimT<1.2))continue;for(const b of B){if(b===a||b.dead||(b.aimT&&st.t-b.aimT<1.2))continue;const d=eqDist(a,b);if(d<bd){bd=d;best=[a,b]}}}
+  if(!best)break;const [a,b]=best,dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d;
+  /* touching already: react right here (this is a real contact, not a teleport) */
+  if(d<=S.sp[a.s].r+S.sp[b.s].r+2){st[pk]--;st['ev'+key]++;st.viaColl=(st.viaColl||0)+1;eqTransform(st,[a,b],to,dir);continue}
+  const v=Math.max(70,Math.hypot(a.vx,a.vy),Math.hypot(b.vx,b.vy));a.vx=ux*v;a.vy=uy*v;b.vx=-ux*v;b.vy=-uy*v;a.aimT=b.aimT=st.t}}
+/* Thermostat: the box sits in a water bath at the chosen temperature. Reactions that merge or split particles change the
+   kinetic energy a little each time; this gently restores the average (mass × speed²) to its starting value. */
+function eqThermostat(st,dt){if(!st.parts.length)return;const S=SYS[st.sys];let e=0;for(const p of st.parts){const m=S.sp[p.s].r**2;e+=m*(p.vx*p.vx+p.vy*p.vy)}e/=st.parts.length;
+ if(!st.E0){let t=0;for(const p of st.parts){const r=S.sp[p.s].r;t+=r*r*(75*75*9/r)}st.E0=t/st.parts.length}
+ /* target uses the same species mix as now */ let tgt=0;for(const p of st.parts){const r=S.sp[p.s].r;tgt+=r*r*(75*75*9/r)}tgt/=st.parts.length;
+ if(e<=0)return;const f=Math.pow(tgt/e,Math.min(1,dt/0.6)/2);for(const p of st.parts){p.vx*=f;p.vy*=f}}
 function eqStep(st,dt){const S=SYS[st.sys],sub=6,h=dt/sub;
  for(let j=0;j<sub;j++){const r=eqRates(st),net=(r.f-r.r)*h;
   S.R.forEach(s=>st.x[s]=Math.max(0,st.x[s]-net));S.P.forEach(s=>st.x[s]=Math.max(0,st.x[s]+net));st.accF+=r.f*h;st.accR+=r.r*h}
@@ -121,16 +149,21 @@ function eqStep(st,dt){const S=SYS[st.sys],sub=6,h=dt/sub;
  const sp=Math.sqrt(st.T/EQ_T0);
  for(const p of st.parts){p.x+=p.vx*dt*sp;p.y+=p.vy*dt*sp;eqClamp(st,p)}
  st.coll=st.coll||0;const c0=st.coll;if(!st.fast)eqCollide(st,dt);   // st.fast: warm-up runs skip collisions (counts don't depend on them)
- /* reactions that wait too long for the right collision (few particles, cold box) happen anyway, so counts stay true */
- while(st.pendF>=1&&(st.pendF>6||st.t-(st.dueF||0)>0.8)){st.pendF--;if(eqEvent(st,S.R,S.P,1))st.evF++;else{st.pendF=0;break}st.dueF=st.t}
- while(st.pendR>=1&&(st.pendR>6||st.t-(st.dueR||0)>0.8)){st.pendR--;if(eqEvent(st,S.P,S.R,-1))st.evR++;else{st.pendR=0;break}st.dueR=st.t}
- for(const s of new Set(S.P)){const lag=st.n[s]-st.x[s],tol=Math.max(1.5,0.06*st.x[s]);
-  if(lag<-tol){if(eqEvent(st,S.R,S.P,1))st.evF++}else if(lag>tol){if(eqEvent(st,S.P,S.R,-1))st.evR++}}
+ /* Reactions that wait for the right collision.
+    One-particle steps (N₂O₄ → 2 NO₂) may happen on their own: the molecule was energized by earlier bumps.
+    Two-particle steps never "teleport": if the right pair hasn't met in time, the nearest pair is steered toward each other,
+    so the reaction still happens at a real collision. Only a pair already touching may react without a fresh bounce. */
+ eqSettle(st,S.R,'F',1);eqSettle(st,S.P,'R',-1);
+ /* keep particle counts close to the smooth amounts: a lag becomes one more pending reaction (handled the same way) */
+ for(const s of new Set(S.P)){const lag=st.n[s]-st.x[s],tol=Math.max(2,0.08*st.x[s]);
+  if(lag<-tol&&st.pendF<1){st.pendF=1;st.dueF=st.t}else if(lag>tol&&st.pendR<1){st.pendR=1;st.dueR=st.t}}
+ eqThermostat(st,dt);
  const a=1-Math.exp(-dt/1.5);st.collRate=(st.collRate||0)+((st.coll-c0)/dt-(st.collRate||0))*a;
  const r2=eqRates(st);st.ema.f=r2.f;st.ema.r=r2.r;
  st.t+=dt;st.flashes=st.flashes.filter(f=>st.t-f.t<0.45)}
 /* stresses: add/remove particles, temperature, volume, catalyst. Each leaves a mark on the graph. */
-function eqChange(st,delta,label){for(const s in delta){let d=delta[s];
+function eqChange(st,delta,label){for(const s in delta){let d=delta[s];if(s==='__V'){eqSetV(st,Math.min(1,st.V+d));continue}   // __V: add water (dilute)
+ 
   if(d>0){for(let i=0;i<d;i++)eqSpawn(st,s);st.x[s]+=d}
   else{const k=d>-1?Math.round((st.n[s]||0)*-d):-d;let gone=0;for(let i=0;i<k;i++){const pool=st.parts.filter(p=>p.s===s);if(!pool.length)break;eqKill(st,pool[Math.floor(eqRand(st)*pool.length)]);gone++}st.x[s]=Math.max(0,st.x[s]-gone)}}
  st.marks.push({t:st.t,label})}
