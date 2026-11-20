@@ -167,6 +167,7 @@ details.howto ul{margin:0 18px 14px;padding-left:22px;line-height:1.6}
  <div id="qArea"></div>
  <div class="btnrow"><button class="btn check" id="checkBtn">Check Answer</button><button class="btn hint" id="hintBtn">💡 Hint</button><button class="btn show" id="showBtn">👀 Show Answer</button></div>
  <div class="hintbox" id="hintBox"></div><div class="fb" id="fb" role="status" aria-live="polite"></div>
+ <button type="button" class="btn dark hidden" id="nextBottom" style="width:100%;margin-top:12px;min-height:54px;font-size:18px">New Question ↻</button>
 </section>
 <details class="card side" id="refPanel"><summary>🧠 Reference</summary><div class="body" id="refBody"></div></details>
 <details class="card side" id="journey"><summary>🧭 Chemistry Journey <span class="badge" id="jChip" style="margin-left:auto;margin-right:6px">Level 1</span></summary><div class="body">
@@ -1064,6 +1065,8 @@ function renderJ(){const l=Math.floor(J.xp/100)+1,i=J.xp%100;$('jChip').textCont
 function award(assisted){const before=Math.floor(J.xp/100);if(assisted)J.xp+=2;else{J.xp+=10+Math.min(state.streak,5)*2;J.correct++;J.best=Math.max(J.best,state.streak);J.modes[state.mode]=(J.modes[state.mode]||0)+1}
  BADGES.forEach(([id,t,,ok])=>{if(!J.badges[id]&&ok(J)){J.badges[id]=1;toast('Badge earned: '+t)}});if(Math.floor(J.xp/100)>before)toast('Level up!');try{localStorage.setItem(JK,JSON.stringify(J))}catch(e){}renderJ()}
 function stats(){[['nCorrect',state.correct],['nStreak',state.streak],['nAssist',state.assist]].forEach(([id,v])=>{const e=$(id);if(e.textContent!==String(v)){e.textContent=v;const p=e.parentElement;p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop')}})}
+/* Bottom "next" button: appears once a question is finished, so students don't scroll back up past the lab. Mirrors the top button's label. */
+function showNext(on){const b=$('nextBottom');if(!b)return;b.classList.toggle('hidden',!on);if(on)b.textContent=$('newBtn').textContent}
 function fb(k,h){$('fb').className='fb '+k;$('fb').innerHTML=h}
 function log(ok){if(state.logged)return;state.logged=true;try{window.ddTrack&&ddTrack({game:'equilibrium',course:'3A',mode:MODES.find(m=>m.id===state.mode).title,topic:state.q.topic||state.q.video||'',correct:!!ok})}catch(e){}}
 function buildModes(){$('modes').innerHTML=MODES.map(m=>`<button type="button" class="mode ${m.id===state.mode?'on':''}" aria-pressed="${m.id===state.mode}" data-m="${m.id}" style="--mb:${m.mb};--ma:${m.ma}">${m.noArt?`<span class="ic">${m.icon}</span>`:`<span class="ic art"><img src="assets/mode-${m.id}.webp" alt="" onerror="this.parentNode.classList.remove('art');this.parentNode.textContent='${m.icon}'"></span>`}<b>${m.title}</b><small>${m.short}</small></button>`).join('');
@@ -1091,7 +1094,7 @@ function quizSummary(){const Q=state.quiz,n=Q.res.filter(r=>r.ok).length;Q.over=
  $('qArea').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{state.mode=TOPICS[b.dataset.go][1];ui.mode=state.mode;saveUI();buildModes();next();$('practice').scrollIntoView({behavior:'smooth'})});
  $('qArea').querySelectorAll('[data-vid]').forEach(b=>b.onclick=()=>{state.q={video:TOPICS[b.dataset.vid][2]};video();openVideo()});
  $('againBtn').onclick=()=>{startQuiz();next()};$('againBtn').focus({preventScroll:true})}
-function next(){clearTimeout(tickTask.t);
+function next(){clearTimeout(tickTask.t);showNext(false);
  $('practice').classList.toggle('quizmode',state.mode==='quiz');$('practice').classList.remove('quizdone');$('newBtn').textContent='New Question ↻';
  if(state.mode==='quiz'){if(!state.quiz||state.quiz.over)startQuiz();else if(state.done&&state.q&&state.q.qi===state.quiz.i)state.quiz.i++;
   if(state.quiz.i>=state.quiz.plan.length){Lab.stop();Park.stop();Factory.stop();state.q={};state.done=true;return quizSummary()}$('newBtn').textContent='Next question →'}
@@ -1133,12 +1136,12 @@ function finish(revealed,quizWrong){state.done=true;['checkBtn','hintBtn','showB
    fb('good','✅ Expression right! '+q.why+'<br>Now plug in the concentrations ↓');$('hintBox').className='hintbox';$('numIn').focus({preventScroll:true});video();return}}
  const ansTxt=q.type==='num'?`${nf(q.answer,q.sf)}${q.unit?' '+q.unit:''}`:q.type==='build'?kExpr(q.r):q.answer;
  if(quizWrong){$('qArea').querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(q.options[+b.dataset.i]===q.answer)b.classList.add('right')});state.streak=0;log(false);stats();
-  fb('bad',q.type==='build'?`❌ Not this time.${buildWhy}<b>The right expression:</b> ${q.why}`:`❌ Not this time. The answer is <b>${ansTxt}</b>.<br>${q.why}${q.type==='mc'?whyList(q):''}`);return}
+  showNext(true);fb('bad',q.type==='build'?`❌ Not this time.${buildWhy}<b>The right expression:</b> ${q.why}`:`❌ Not this time. The answer is <b>${ansTxt}</b>.<br>${q.why}${q.type==='mc'?whyList(q):''}`);return}
  $('qArea').querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(q.options[+b.dataset.i]===q.answer)b.classList.add('right')});
  let demo='';if(q.lab&&q.lab.demo){Lab.apply(q.lab.demo);demo=`<br>🔬 <b>Watch the lab above:</b> we just made that change. See the balance beam tip, then level off.`}
  if(revealed){state.assist++;state.streak=0;log(false);fb('good',`👀 <b>${ansTxt}</b><br>${q.why}${demo}${q.type==='mc'?whyList(q):''}<br><small>Assisted: no point this time. <button class="linkbtn" onclick="openVideo()">🎥 Review with Dr. Dan</button></small>`);award(true)}
  else{state.correct++;state.streak++;log(true);confetti();fb('good','✅ Correct! '+q.why+demo+(q.type==='mc'?whyList(q):''));award(false)}stats();
- const a=document.activeElement;if(!a||a===document.body||a.disabled)$('newBtn').focus({preventScroll:true})}
+ showNext(true);const a=document.activeElement;if(!a||a===document.body||a.disabled)$('nextBottom').focus({preventScroll:true})}
 function checkNum(q){const raw=$('numIn').value.trim();if(!raw)return fb('bad','Type your answer first.');
  if(NUM.decimalComma(raw))return fb('bad','Use a period for decimals (type 1.5, not 1,5). Commas only for thousands, like 1,200.');
  const v=NUM.parseValue(raw);if(!isFinite(v))return fb('bad','Type one number, like 54.1 or 2.9E-32.');
@@ -1169,7 +1172,10 @@ function video(){const v=VIDEO_FOR[state.q?.video];const src=v?`https://www.yout
 function openVideo(){$('videoPanel').open=true;$('player').src=$('player').dataset.want;$('videoPanel').scrollIntoView({behavior:'smooth',block:'center'})}
 $('videoPanel').addEventListener('toggle',()=>{if($('videoPanel').open&&!$('player').src)$('player').src=$('player').dataset.want});
 $('refBody').innerHTML=REFERENCE.map(([t,d])=>`<div class="refcard"><b>${t}</b><div>${d}</div></div>`).join('');
-$('checkBtn').onclick=check;$('hintBtn').onclick=hint;$('showBtn').onclick=()=>{if(!state.done){if(!state.taskOk){state.taskOk=true}finish(true)}};$('newBtn').onclick=()=>{if(state.mode==='quiz'&&state.quiz&&!state.quiz.over&&!state.done)return fb('bad','Answer this question first. (Each question gets one try.)');next()};
+$('checkBtn').onclick=check;$('hintBtn').onclick=hint;$('showBtn').onclick=()=>{if(!state.done){if(!state.taskOk){state.taskOk=true}finish(true)}};/* Jump (not smooth-scroll) to the new question once it has drawn: iOS Safari cancels a smooth scroll while the lab rebuilds the page. */
+$('nextBottom').onclick=()=>{$('newBtn').click();const go=()=>{const t=$('qArea').getBoundingClientRect().top+scrollY-10;window.scrollTo(0,Math.max(0,t))};
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{go();setTimeout(go,250);setTimeout(()=>{const f=$('qArea').querySelector('.opt,#numIn,.kbrow button,.chip');if(f)f.focus({preventScroll:true})},300)}))};
+$('newBtn').onclick=()=>{if(state.mode==='quiz'&&state.quiz&&!state.quiz.over&&!state.done)return fb('bad','Answer this question first. (Each question gets one try.)');next()};
 {let armed=0;$('resetBtn').onclick=()=>{if(!armed){$('resetBtn').textContent='Tap again to confirm';armed=setTimeout(()=>{armed=0;$('resetBtn').textContent='Reset progress'},4000);return}clearTimeout(armed);armed=0;J=jBlank();try{localStorage.setItem(JK,JSON.stringify(J))}catch(e){}$('resetBtn').textContent='Reset progress';renderJ()}}
 if(!matchMedia('(max-width:1000px)').matches){$('journey').open=true;$('videoPanel').open=true}
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target.tagName;if(e.target.id==='numIn'&&e.key==='Enter'){e.preventDefault();state.done?$('newBtn').click():check();return}if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||e.target.isContentEditable)return;
