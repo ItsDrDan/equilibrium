@@ -14,7 +14,7 @@ const SYS={
   units:{N2O4:1,NO2:0.5},total:60,                       // 60 N₂O₄-equivalents
   tint:{sp:'NO2',rgb:[160,72,28],k:0.0085,max:0.62},tintName:'brown color',
   look:'brown NO₂ gas; N₂O₄ is nearly colorless',
-  stress:[['addR','➕ N₂O₄',{N2O4:15}],['addP','➕ NO₂',{NO2:30}],['remP','➖ NO₂',{NO2:-0.5}]]},
+  stress:[['addR','➕ N₂O₄',{N2O4:15}],['remR','➖ N₂O₄',{N2O4:-0.5}],['addP','➕ NO₂',{NO2:30}],['remP','➖ NO₂',{NO2:-0.5}]]},
  hi:{real:'🏭 Hydrogen iodide is made for medicines and disinfectants; the violet I₂ shows how far it has reacted.',title:'H₂ + I₂ ⇌ 2 HI',gas:true,heat:true,dH:-9,
   eq:[[1,'H2','g'],[1,'I2','g']],eqP:[[2,'HI','g']],
   sp:{H2:{l:'H₂',c:'#ffffff',e:'#7d8a94',r:5.5},I2:{l:'I₂',c:'#6b3fa0',e:'#3e1f63',r:9},HI:{l:'HI',c:'#d8c8ec',e:'#7a62a0',r:7}},
@@ -22,7 +22,7 @@ const SYS={
   units:{H2:1,I2:1,HI:1},total:null,start:{H2:40,I2:40,HI:0},
   tint:{sp:'I2',rgb:[110,50,160],k:0.012,max:0.6},tintName:'purple color',
   look:'violet I₂ vapor; H₂ and HI are colorless',
-  stress:[['addR','➕ H₂',{H2:20}],['addR2','➕ I₂',{I2:20}],['addP','➕ HI',{HI:30}]]},
+  stress:[['addR','➕ H₂',{H2:20}],['remR','➖ H₂',{H2:-0.5}],['addR2','➕ I₂',{I2:20}],['remR2','➖ I₂',{I2:-0.5}],['addP','➕ HI',{HI:30}],['remP','➖ HI',{HI:-0.5}]]},
  fescn:{real:'🧪 A classic lab test: the blood-red color reveals Fe³⁺ (iron) or SCN⁻ in a sample.',title:'Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ (blood-red)',gas:false,heat:true,dH:-1,
   eq:[[1,'Fe','aq'],[1,'SCN','aq']],eqP:[[1,'FeSCN','aq']],
   sp:{Fe:{l:'Fe³⁺',c:'#f0c64a',e:'#a7801a',r:7.5},SCN:{l:'SCN⁻',c:'#cfd7dd',e:'#6f7b84',r:6},FeSCN:{l:'FeSCN²⁺',c:'#b3122a',e:'#6b0716',r:9.5}},
@@ -30,7 +30,7 @@ const SYS={
   units:{Fe:1,SCN:1,FeSCN:1},start:{Fe:45,SCN:45,FeSCN:0},
   tint:{sp:'FeSCN',rgb:[178,18,40],k:0.016,max:0.7},tintName:'red color',
   look:'blood-red FeSCN²⁺; Fe³⁺ is pale yellow, SCN⁻ colorless',
-  stress:[['addR','➕ Fe³⁺',{Fe:20}],['addR2','➕ SCN⁻',{SCN:20}],['remR','➖ Fe³⁺',{Fe:-0.6}]]},
+  stress:[['addR','➕ Fe³⁺',{Fe:20}],['remR','➖ Fe³⁺',{Fe:-0.6}],['addR2','➕ SCN⁻',{SCN:20}],['remR2','➖ SCN⁻',{SCN:-0.6}],['addP','➕ FeSCN²⁺',{FeSCN:15}],['remP','➖ FeSCN²⁺',{FeSCN:-0.5}]]},
  blood:{real:'🩸 The main buffer in your blood keeps pH near 7.4. Lungs remove CO₂; kidneys adjust HCO₃⁻.',title:'CO₂ + H₂O ⇌ H⁺ + HCO₃⁻ (blood buffer)',gas:false,heat:false,dH:null,
   eq:[[1,'CO2','aq'],[1,'H2O','l']],eqP:[[1,'H','aq'],[1,'HCO3','aq']],
   sp:{CO2:{l:'CO₂',c:'#8b96a0',e:'#4d5862',r:10},H:{l:'H⁺',c:'#ff8fb1',e:'#b23a62',r:4.5},HCO3:{l:'HCO₃⁻',c:'#7cc4e8',e:'#2e6f96',r:10}},
@@ -38,15 +38,17 @@ const SYS={
   units:{CO2:1,H:1,HCO3:1},start:{CO2:40,HCO3:25,H:0},
   tint:{sp:'H',mix:[[214,40,80],[240,200,40]],lo:5,hi:15,a:0.34},tintName:'indicator color',tube:'pH indicator',
   look:'a pH indicator in the blood sample: pink-red when basic, yellow when acidic',
-  stress:[['remR','😮‍💨 Hyperventilate (blow off CO₂)',{CO2:-0.5}],['addR','🫁 Hold breath / COPD (+CO₂)',{CO2:20}],['addP','🏃 Lactic acid (+H⁺)',{H:12}],['addP2','💉 Bicarbonate IV (+HCO₃⁻)',{HCO3:20}]]},
+  stress:[['remR','😮‍💨 Hyperventilate (blow off CO₂)',{CO2:-0.5}],['addR','🫁 Hold breath / COPD (+CO₂)',{CO2:20}],['addP','🏃 Lactic acid (+H⁺)',{H:12}],['remP','🫘 Kidneys excrete H⁺ (−H⁺)',{H:-0.6}],['addP2','💉 Bicarbonate IV (+HCO₃⁻)',{HCO3:20}],['remP2','🚽 Severe diarrhea (−HCO₃⁻)',{HCO3:-0.5}]],
+  pure:'💧 <b>H₂O(l)</b> is the solvent, a pure liquid, so it is <b>left out of K</b>: K = [H⁺][HCO₃⁻] / [CO₂]. Pure liquids (l) and solids (s) never go in K; only (aq) and (g) do.'},
  cobalt:{real:'🧪 The classic color demo (and humidity-indicator strips): pink when cool or watery, blue when hot or full of chloride.',title:'Co(H₂O)₆²⁺ + 4 Cl⁻ ⇌ CoCl₄²⁻ + 6 H₂O (pink ⇌ blue)',gas:false,heat:true,dH:1,V0:0.7,
   eq:[[1,'Co','aq'],[4,'Cl','aq']],eqP:[[1,'CoCl','aq'],[6,'H2O','l']],
-  sp:{Co:{l:'Co(H₂O)₆²⁺',c:'#f2a3c4',e:'#a8457a',r:9},Cl:{l:'Cl⁻ (×4)',eqL:'Cl⁻',c:'#a8d88a',e:'#4f8a35',r:6},CoCl:{l:'CoCl₄²⁻',c:'#3f6fd6',e:'#1c3f8f',r:13}},
+  sp:{Co:{l:'Co(H₂O)₆²⁺',c:'#f2a3c4',e:'#a8457a',r:11},Cl:{l:'Cl⁻ (×4)',eqL:'Cl⁻',c:'#a8d88a',e:'#4f8a35',r:6},CoCl:{l:'CoCl₄²⁻',c:'#3f6fd6',e:'#1c3f8f',r:13}},
   R:['Co','Cl'],P:['CoCl'],kf:0.0011,kr:0.075,Ef:52000,Er:12000,
   units:{Co:1,Cl:4,CoCl:1},start:{Co:40,Cl:70,CoCl:0},
   tint:{sp:'CoCl',ratio:['Co','CoCl'],mix:[[236,96,160],[44,88,220]],a:0.6},tintName:'color',tube:'Test tube',
   note:'Model: each green bead stands for a group of 4 Cl⁻.',
-  stress:[['addR2','🧂 Add HCl (+Cl⁻)',{Cl:20}],['dil','💧 Add water',{__V:0.3}],['remR2','🥄 Add AgNO₃ (removes Cl⁻)',{Cl:-0.55}]]},
+  stress:[['addR','➕ Co(H₂O)₆²⁺ (pink)',{Co:12}],['remR','➖ Co(H₂O)₆²⁺',{Co:-0.5}],['addR2','🧂 Add HCl (+Cl⁻)',{Cl:20}],['remR2','🥄 Add AgNO₃ (removes Cl⁻)',{Cl:-0.55}],['addP','➕ CoCl₄²⁻ (blue)',{CoCl:12}],['remP','➖ CoCl₄²⁻',{CoCl:-0.5}],['dil','💧 Add water',{__V:0.3}]],
+  pure:'💧 <b>H₂O(l)</b> is a pure liquid, so it is <b>left out of K</b>: K = [CoCl₄²⁻] / ([Co(H₂O)₆²⁺][Cl⁻]⁴). Pure liquids (l) and solids (s) never go in K. 💧 Add water still turns it pink, but only because it <b>dilutes</b> every ion (Q changes), not because water is in K.'},
  hb:{real:'⛰️ Climbers, athletes and patients on oxygen: how much O₂ your hemoglobin carries.',title:'Hb + O₂ ⇌ HbO₂ (your blood)',gas:false,heat:false,dH:null,
   eq:[[1,'Hb','aq'],[1,'O2','g']],eqP:[[1,'HbO2','aq']],
   sp:{Hb:{l:'Hb',c:'#7b2f4a',e:'#45142a',r:10},O2:{l:'O₂',c:'#9fd3f2',e:'#3f86b5',r:5.5},HbO2:{l:'HbO₂',c:'#ef4a3c',e:'#9c1d14',r:11}},
@@ -54,7 +56,7 @@ const SYS={
   units:{Hb:1,O2:1,HbO2:1},start:{Hb:35,O2:60,HbO2:0},
   tint:{sp:'HbO2',rgb:[220,40,40],k:0.014,max:0.62},tintName:'bright red color',
   look:'oxygen-rich blood is bright red; low-oxygen blood is darker',
-  stress:[['remR2','⛰️ Climb high (less O₂)',{O2:-0.55}],['addR2','😷 Oxygen mask (+O₂)',{O2:30}],['addR','🩸 Body makes more Hb',{Hb:15}]]}
+  stress:[['remR2','⛰️ Climb high (less O₂)',{O2:-0.55}],['addR2','😷 Oxygen mask (+O₂)',{O2:30}],['addR','🩸 Body makes more Hb',{Hb:15}],['remR','🩹 Anemia (less Hb)',{Hb:-0.45}],['addP','➕ HbO₂',{HbO2:12}],['remP','➖ HbO₂',{HbO2:-0.5}]]}
 };
 function eqCount(st,list){/* mass-action factor for one side, e.g. ['NO2','NO2'] → x² */
  let f=1;list.forEach(s=>f*=Math.max(0,st.x[s]||0));return f}

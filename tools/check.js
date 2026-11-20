@@ -75,4 +75,12 @@ for(const r of RX.filter(x=>x.sim))for(const s of stressesFor(r)){const d=demoFo
  const bus=run(st=>rideAdd(st,20,'')),fire=run(st=>rideAdd(st,-15,'')),crew=run(st=>st.crew=true),lng=run(st=>st.long=true);n+=4;
  console.log('ride change: bus',bus.toFixed(2),'fireworks',fire.toFixed(2),'crew',crew.toFixed(2),'long',lng.toFixed(2));
  if(bus<0.15)bad('bus should add riders');if(fire>-0.1)bad('fireworks should remove riders');if(Math.abs(crew)>0.08)bad('crew should not change counts');if(lng<0.2)bad('long ride should add riders')}
+/* every lab species can be added AND removed, and each button shifts the sim the Le Chatelier way */
+for(const sys in SYS){const S=SYS[sys];
+ for(const k of Object.keys(S.sp)){const v=S.stress.map(z=>z[2][k]).filter(x=>x!=null);if(!v.some(x=>x>0))bad(`${sys}: no add button for ${k}`);if(!v.some(x=>x<0))bad(`${sys}: no remove button for ${k}`);n++}
+ const prod=S.P[0];
+ for(const [key,label,delta] of S.stress){if('__V' in delta)continue;const sp=Object.keys(delta)[0],isR=S.R.includes(sp),add=delta[sp]>0;
+  const want=(isR===add)?1:-1;let sum=0;
+  for(let t=0;t<3;t++){const st=eqNew(sys,{V:S.V0??(S.gas?0.7:1),seed:900+t*31});eqRun(st,25);eqChange(st,delta,'');const p0=st.x[prod];eqRun(st,20);sum+=Math.sign(st.x[prod]-p0)}
+  if(Math.sign(sum)!==want)bad(`${sys} ${label}: product ${prod} moved ${sum>0?'up':'down'}, expected ${want>0?'up':'down'}`);n++}}
 console.log(fails?`${fails} problems`:`OK · ${n} checks`);process.exit(fails?1:0);
