@@ -233,7 +233,7 @@ const SYS={
   tint:{sp:'H',mix:[[214,40,80],[240,200,40]],lo:5,hi:15,a:0.34},tintName:'indicator color',tube:'pH indicator',
   look:'a pH indicator in the blood sample: pink-red when basic, yellow when acidic',
   stress:[['remR','😮‍💨 Hyperventilate (blow off CO₂)',{CO2:-0.5}],['addR','🫁 Hold breath / COPD (+CO₂)',{CO2:20}],['addP','🏃 Lactic acid (+H⁺)',{H:12}],['remP','🫘 Kidneys excrete H⁺ (−H⁺)',{H:-0.6}],['addP2','💉 Bicarbonate IV (+HCO₃⁻)',{HCO3:20}],['remP2','🚽 Severe diarrhea (−HCO₃⁻)',{HCO3:-0.5}]],
-  pure:'💧 <b>H₂O(l)</b> is the solvent, a pure liquid, so it is <b>left out of K</b>: K = [H⁺][HCO₃⁻] / [CO₂]. Pure liquids (l) and solids (s) never go in K; only (aq) and (g) do.'},
+  pure:'💧 <b>H₂O(l)</b> is a pure liquid (water used as the solvent). This equilibrium involves more than one phase, so it is <b>heterogeneous</b>. The concentration of a pure liquid does not change, so it is <b>left out of K</b>: K = [H⁺][HCO₃⁻] / [CO₂]. Only gases (g) and dissolved species (aq) appear in K.'},
  cobalt:{real:'🧪 The classic color demo (and humidity-indicator strips): pink when cool or watery, blue when hot or full of chloride.',title:'Co(H₂O)₆²⁺ + 4 Cl⁻ ⇌ CoCl₄²⁻ + 6 H₂O (pink ⇌ blue)',gas:false,heat:true,dH:1,V0:0.7,
   eq:[[1,'Co','aq'],[4,'Cl','aq']],eqP:[[1,'CoCl','aq'],[6,'H2O','l']],
   sp:{Co:{l:'Co(H₂O)₆²⁺',c:'#f2a3c4',e:'#a8457a',r:11},Cl:{l:'Cl⁻ (×4)',eqL:'Cl⁻',c:'#a8d88a',e:'#4f8a35',r:6},CoCl:{l:'CoCl₄²⁻',c:'#3f6fd6',e:'#1c3f8f',r:13}},
@@ -242,7 +242,7 @@ const SYS={
   tint:{sp:'CoCl',ratio:['Co','CoCl'],mix:[[236,96,160],[44,88,220]],a:0.6},tintName:'color',tube:'Test tube',
   note:'Model: each green bead stands for a group of 4 Cl⁻.',
   stress:[['addR','➕ Co(H₂O)₆²⁺ (pink)',{Co:12}],['remR','➖ Co(H₂O)₆²⁺',{Co:-0.5}],['addR2','🧂 Add HCl (+Cl⁻)',{Cl:20}],['remR2','🥄 Add AgNO₃ (removes Cl⁻)',{Cl:-0.55}],['addP','➕ CoCl₄²⁻ (blue)',{CoCl:12}],['remP','➖ CoCl₄²⁻',{CoCl:-0.5}],['dil','💧 Add water',{__V:0.3}]],
-  pure:'💧 <b>H₂O(l)</b> is a pure liquid, so it is <b>left out of K</b>: K = [CoCl₄²⁻] / ([Co(H₂O)₆²⁺][Cl⁻]⁴). Pure liquids (l) and solids (s) never go in K. 💧 Add water still turns it pink, but only because it <b>dilutes</b> every ion (Q changes), not because water is in K.'},
+  pure:'💧 <b>H₂O(l)</b> is a pure liquid (water used as the solvent). This equilibrium involves more than one phase, so it is <b>heterogeneous</b>. The concentration of a pure liquid does not change, so it is <b>left out of K</b>: K = [CoCl₄²⁻] / ([Co(H₂O)₆²⁺][Cl⁻]⁴). 💧 Add water still turns it pink, but only because it <b>dilutes</b> every ion (Q changes), not because water is in K.'},
  hb:{real:'⛰️ Climbers, athletes and patients on oxygen: how much O₂ your hemoglobin carries.',title:'Hb + O₂ ⇌ HbO₂ (your blood)',gas:false,heat:false,dH:null,
   eq:[[1,'Hb','aq'],[1,'O2','g']],eqP:[[1,'HbO2','aq']],
   sp:{Hb:{l:'Hb',c:'#7b2f4a',e:'#45142a',r:10},O2:{l:'O₂',c:'#9fd3f2',e:'#3f86b5',r:5.5},HbO2:{l:'HbO₂',c:'#ef4a3c',e:'#9c1d14',r:11}},
@@ -450,12 +450,14 @@ const RX=[
 const sp=e=>`${e[0]>1?e[0]+' ':''}${e[1]}(${e[2]})`;
 const rxText=r=>r.L.map(sp).join(' + ')+' ⇌ '+r.R.map(sp).join(' + ');
 const dHText=r=>r.dH==null?'':Math.abs(r.dH)===1?(r.dH<0?'ΔH &lt; 0 (exothermic)':'ΔH &gt; 0 (endothermic)'):`ΔH = ${r.dH>0?'+':'−'}${Math.abs(r.dH)} kJ`;
+/* Wording follows the CHEM 3A textbook, Section 13.3 ("Leave Out Pure Solids and Liquids"): one that involves more than one phase is
+   heterogeneous; the concentration of a pure solid or pure liquid (including water used as the solvent) does not change, so it is left out. */
 function pureNote(r){const all=[...r.L,...r.R],pure=all.filter(t=>t[2]==='l'||t[2]==='s');if(!pure.length)return'';
  const names=[...new Set(pure.map(t=>`${t[1]}(${t[2]})`))],sol=pure.some(t=>t[2]==='s'),liq=pure.some(t=>t[2]==='l'),many=names.length>1;
  const kind=sol&&liq?'pure solids and liquids':sol?(many?'pure solids':'a pure solid'):(many?'pure liquids':'a pure liquid');
- const het=new Set(all.map(t=>t[2])).size>1&&(sol||all.some(t=>t[2]==='g'));
+ const het=new Set(all.map(t=>t[2])).size>1;
  const solvent=!sol&&pure.every(t=>/^H₂O$/.test(t[1]))&&all.some(t=>t[2]==='aq');
- return `<p class="purenote">${sol?'🪨':'💧'} <b>${names.join(' and ')}</b> ${many?'are':'is'} ${kind}${solvent?' (water is the solvent)':''}, so ${many?'they are':'it is'} <b>left out of K</b>${het?'. This is a <b>heterogeneous</b> equilibrium (more than one phase)':''}.${sol?` Adding more solid does not shift the equilibrium.`:''} Rule: pure solids (s) and liquids (l) never go in K; only (aq) and (g) do.</p>`}
+ return `<p class="purenote">${sol?'🪨':'💧'} <b>${names.join(' and ')}</b> ${many?'are':'is'} ${kind}${solvent?' (water used as the solvent)':''}.${het?' This equilibrium involves more than one phase, so it is <b>heterogeneous</b>.':''} The concentration of ${sol&&liq?'a pure solid or pure liquid':sol?'a pure solid':'a pure liquid'} does not change during the reaction, so ${many?'they are':'it is'} <b>left out of K</b>.${sol?' Adding more solid causes no shift.':''} Only gases (g) and dissolved species (aq) appear in K.</p>`}
 const rxHTML=(r,showH=true,note=true)=>`<div class="rxn">${rxText(r)}${showH&&r.dH!=null?`<span class="dh">${dHText(r)}</span>`:''}${r.ctx?`<span class="dh">${r.ctx}</span>`:''}</div>${note?pureNote(r):''}`;
 const gasMoles=side=>side.filter(e=>e[2]==='g').reduce((s,e)=>s+e[0],0);
 /* every stress that makes sense for a reaction */

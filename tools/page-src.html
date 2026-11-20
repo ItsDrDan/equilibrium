@@ -256,12 +256,14 @@ const RX=[
 const sp=e=>`${e[0]>1?e[0]+' ':''}${e[1]}(${e[2]})`;
 const rxText=r=>r.L.map(sp).join(' + ')+' ⇌ '+r.R.map(sp).join(' + ');
 const dHText=r=>r.dH==null?'':Math.abs(r.dH)===1?(r.dH<0?'ΔH &lt; 0 (exothermic)':'ΔH &gt; 0 (endothermic)'):`ΔH = ${r.dH>0?'+':'−'}${Math.abs(r.dH)} kJ`;
+/* Wording follows the CHEM 3A textbook, Section 13.3 ("Leave Out Pure Solids and Liquids"): one that involves more than one phase is
+   heterogeneous; the concentration of a pure solid or pure liquid (including water used as the solvent) does not change, so it is left out. */
 function pureNote(r){const all=[...r.L,...r.R],pure=all.filter(t=>t[2]==='l'||t[2]==='s');if(!pure.length)return'';
  const names=[...new Set(pure.map(t=>`${t[1]}(${t[2]})`))],sol=pure.some(t=>t[2]==='s'),liq=pure.some(t=>t[2]==='l'),many=names.length>1;
  const kind=sol&&liq?'pure solids and liquids':sol?(many?'pure solids':'a pure solid'):(many?'pure liquids':'a pure liquid');
- const het=new Set(all.map(t=>t[2])).size>1&&(sol||all.some(t=>t[2]==='g'));
+ const het=new Set(all.map(t=>t[2])).size>1;
  const solvent=!sol&&pure.every(t=>/^H₂O$/.test(t[1]))&&all.some(t=>t[2]==='aq');
- return `<p class="purenote">${sol?'🪨':'💧'} <b>${names.join(' and ')}</b> ${many?'are':'is'} ${kind}${solvent?' (water is the solvent)':''}, so ${many?'they are':'it is'} <b>left out of K</b>${het?'. This is a <b>heterogeneous</b> equilibrium (more than one phase)':''}.${sol?` Adding more solid does not shift the equilibrium.`:''} Rule: pure solids (s) and liquids (l) never go in K; only (aq) and (g) do.</p>`}
+ return `<p class="purenote">${sol?'🪨':'💧'} <b>${names.join(' and ')}</b> ${many?'are':'is'} ${kind}${solvent?' (water used as the solvent)':''}.${het?' This equilibrium involves more than one phase, so it is <b>heterogeneous</b>.':''} The concentration of ${sol&&liq?'a pure solid or pure liquid':sol?'a pure solid':'a pure liquid'} does not change during the reaction, so ${many?'they are':'it is'} <b>left out of K</b>.${sol?' Adding more solid causes no shift.':''} Only gases (g) and dissolved species (aq) appear in K.</p>`}
 const rxHTML=(r,showH=true,note=true)=>`<div class="rxn">${rxText(r)}${showH&&r.dH!=null?`<span class="dh">${dHText(r)}</span>`:''}${r.ctx?`<span class="dh">${r.ctx}</span>`:''}</div>${note?pureNote(r):''}`;
 const gasMoles=side=>side.filter(e=>e[2]==='g').reduce((s,e)=>s+e[0],0);
 /* every stress that makes sense for a reaction */
