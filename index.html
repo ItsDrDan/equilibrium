@@ -459,19 +459,20 @@ function shiftOf(r,s){const away=s.side==='L'?'R':'L',toward=s.side;
   case'heat':return r.dH>0?'R':'L';case'cool':return r.dH>0?'L':'R';
   case'comp':{const a=gasMoles(r.L),b=gasMoles(r.R);return a===b?'0':a>b?'R':'L'}
   case'exp':{const a=gasMoles(r.L),b=gasMoles(r.R);return a===b?'0':a>b?'L':'R'}}}
-const DIRTXT={R:'Shifts right, toward products',L:'Shifts left, toward reactants','0':'No shift'};
+const DIRTXT={R:'Shifts toward products',L:'Shifts toward reactants','0':'No change'};   /* Dr. Dan's wording (2026-11-20) */
+const DIRSHORT={R:'toward products',L:'toward reactants','0':'no change'};
 const sideWord=x=>x==='L'?'reactant':'product';
 /* teaching reason for the right answer */
 function reasonOf(r,s){const d=shiftOf(r,s),a=gasMoles(r.L),b=gasMoles(r.R),hs=r.dH>0?'endothermic, so heat acts like a <b>reactant</b>':'exothermic, so heat acts like a <b>product</b>';
  switch(s.t){
- case'add':return `${s.e[1]} is a ${sideWord(s.side)}. Adding it speeds up the reaction that <b>uses it up</b>, so the equilibrium shifts <b>away</b> from it: ${DIRTXT[d].toLowerCase()}.`;
- case'rem':return `${s.e[1]} is a ${sideWord(s.side)}. Taking it away slows the reaction that uses it, so the system <b>makes more</b> of it: shift <b>toward</b> it, ${DIRTXT[d].toLowerCase()}.`;
+ case'add':return `${s.e[1]} is a ${sideWord(s.side)}. Adding it speeds up the reaction that <b>uses it up</b>, so the equilibrium shifts <b>away</b> from it: ${DIRSHORT[d]}.`;
+ case'rem':return `${s.e[1]} is a ${sideWord(s.side)}. Taking it away slows the reaction that uses it, so the system <b>makes more</b> of it: shift <b>toward</b> it, which is ${DIRSHORT[d]}.`;
  case'addS':return `${s.e[1]} is a pure <b>solid</b>. Solids aren't in the K expression; adding more doesn't change any concentration, so there is <b>no shift</b>.`;
  case'cat':return 'A catalyst speeds up the forward <b>and</b> reverse reactions by the same factor. Equilibrium is reached faster, but the amounts <b>don\'t change</b>: no shift.';
- case'heat':return `The reaction is ${hs}. Adding heat is like adding that substance, so it shifts <b>away</b> from the heat: ${DIRTXT[d].toLowerCase()}.`;
- case'cool':return `The reaction is ${hs}. Cooling removes heat, so the system shifts <b>toward</b> the heat side to make more: ${DIRTXT[d].toLowerCase()}.`;
- case'comp':return a===b?`Count gas moles: ${a} on the left and ${b} on the right. They're equal, so squeezing can't be relieved: <b>no shift</b>.`:`Count gas moles: ${a} on the left, ${b} on the right. A smaller volume favors the side with <b>fewer gas moles</b>: ${DIRTXT[d].toLowerCase()}.`;
- case'exp':return a===b?`Count gas moles: ${a} on the left and ${b} on the right. They're equal, so a bigger volume causes <b>no shift</b>.`:`Count gas moles: ${a} on the left, ${b} on the right. A bigger volume favors the side with <b>more gas moles</b>: ${DIRTXT[d].toLowerCase()}.`}}
+ case'heat':return `The reaction is ${hs}. Adding heat is like adding that substance, so it shifts <b>away</b> from the heat: ${DIRSHORT[d]}.`;
+ case'cool':return `The reaction is ${hs}. Cooling removes heat, so the system shifts <b>toward</b> the heat side to make more: ${DIRSHORT[d]}.`;
+ case'comp':return a===b?`Count gas moles: ${a} on the left and ${b} on the right. They're equal, so squeezing can't be relieved: <b>no shift</b>.`:`Count gas moles: ${a} on the left, ${b} on the right. A smaller volume favors the side with <b>fewer gas moles</b>: ${DIRSHORT[d]}.`;
+ case'exp':return a===b?`Count gas moles: ${a} on the left and ${b} on the right. They're equal, so a bigger volume causes <b>no shift</b>.`:`Count gas moles: ${a} on the left, ${b} on the right. A bigger volume favors the side with <b>more gas moles</b>: ${DIRSHORT[d]}.`}}
 /* why a picked direction is wrong (named mistake) */
 function wrongDir(r,s,pickD){const d=shiftOf(r,s);
  if(pickD==='0'){return {add:'Adding a substance that is in K is a stress, so something must shift.',rem:'Removing a substance that is in K is a stress, so something must shift.',heat:'ΔH is not zero, so a temperature change always shifts the equilibrium.',cool:'ΔH is not zero, so a temperature change always shifts the equilibrium.',comp:'The two sides have different numbers of gas moles, so volume matters here.',exp:'The two sides have different numbers of gas moles, so volume matters here.'}[s.t]||''}
@@ -783,12 +784,12 @@ const LAB_Q=[
  {sys:'no2',f:()=>({video:'lecP',task:{need:'V:small',say:'Slide 🫸 Volume down to 45% or less (push the piston in).'},prompt:'You pushed the piston in. Once it settles, which way did it shift?',hint:'Count gas particles: 1 N₂O₄ on the left, 2 NO₂ on the right. Squeezing favors fewer.',choices:[
   ['Toward N₂O₄: fewer gas particles',true,'Right! A smaller volume (higher pressure) favors the side with fewer gas moles. Two NO₂ join into one N₂O₄.'],
   ['Toward NO₂: more gas particles',false,'More particles in a smaller box would raise the pressure even more. The system does the opposite.'],
-  ['No shift',false,'The sides have different numbers of gas moles (1 vs 2), so volume matters here.'],
+  ['No change',false,'The sides have different numbers of gas moles (1 vs 2), so volume matters here.'],
   ['All of it turns into NO₂',false,'Watch the counts: N₂O₄ goes up after squeezing.']]})},
  {sys:'no2',f:()=>({video:'lecV',task:{need:'V:big',say:'Slide 🫸 Volume up to 95% or more.'},prompt:'You gave the gas more room. Which way did it shift?',hint:'More room favors the side with more gas particles.',choices:[
   ['Toward NO₂: more gas particles',true,'Yes. Lower pressure favors the side with more gas moles, so more N₂O₄ splits into 2 NO₂.'],
   ['Toward N₂O₄: fewer gas particles',false,'That is what squeezing does. Expanding is the opposite.'],
-  ['No shift',false,'1 vs 2 gas moles: volume changes do shift this reaction.'],
+  ['No change',false,'1 vs 2 gas moles: volume changes do shift this reaction.'],
   ['The reaction stops',false,'Both reactions keep running; the balance point just moves.']]})},
  {sys:'no2',f:()=>({video:'lecAdd',task:{need:'stress:addP',say:'Tap ➕ NO₂.'},prompt:'Right after you add NO₂, which rate jumps up?',hint:'Which reaction uses NO₂ as its starting material?',choices:[
   ['The reverse rate (2 NO₂ → N₂O₄)',true,'Right! More NO₂ means more NO₂ collisions, so the reverse reaction speeds up and uses some of it: a shift to the left.'],
@@ -1147,7 +1148,7 @@ const GEN={
   const ss=stressesFor(r);
   if(roll<0.5)return shiftDir(r,pick(ss));
   if(roll<0.72)return shiftSpecies(r,ss);
-  if(roll<0.84&&r.dH!=null)return shiftK(r,ss);
+  if(roll<0.84)return shiftDir(r,pick(ss));   /* K-value questions live in Big Ideas & K; Shift It! asks which way it shifts */
   return shiftWhich(r,ss)},
  calc(){if(Math.random()<0.35){const id=pick(CALC_IDS),r=RX.find(x=>x.id===id),c=calcQ('kc',r);
    const b=buildQ(r,{topic:'calc',prompt:'<b>Step 1 of 2:</b> build the K<sub>c</sub> expression. Then you\'ll plug in the numbers.',html:c.html});b.then=c;return b}
@@ -1155,7 +1156,7 @@ const GEN={
  quiz(){const Q=state.quiz;return topicQ(Q&&!Q.over?Q.plan[Q.i]:pick(QUIZ_PLAN))},
  ideas(){const roll=Math.random();
   if(roll<0.28){const it=pickNew('ideas',IDEAS);return mc({video:it.v,prompt:it.p,hint:it.h,choices:it.c})}
-  if(roll<0.40)return kExprQ();if(roll<0.56)return buildQ(pick(RX));if(roll<0.66)return kMagQ();if(roll<0.72)return kRevQ();if(roll<0.9)return acidQ();return graphQ()}};
+  if(roll<0.40)return kExprQ();if(roll<0.56)return buildQ(pick(RX));if(roll<0.66)return kMagQ();if(roll<0.71)return kRevQ();if(roll<0.78){const rk=pick(RX.filter(x=>x.dH!=null));return shiftK(rk,stressesFor(rk))}if(roll<0.92)return acidQ();return graphQ()}};
 /* Real-world scenarios (medical, biological, engineering, everyday chemistry): about 1 in 3 Shift It! questions */
 const APPS=[
  {v:'lecRem',tag:'🏥 Medicine',p:'A patient breathes into a paper bag during a panic attack, re-breathing some CO₂. How does that help their blood?',x:'CO₂(aq) + H₂O(l) ⇌ H⁺(aq) + HCO₃⁻(aq)',h:'Fast breathing removed CO₂. Re-breathing adds some back. Which way does adding CO₂ shift?',c:[
